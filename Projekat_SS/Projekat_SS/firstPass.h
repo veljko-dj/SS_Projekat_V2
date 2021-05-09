@@ -20,8 +20,11 @@ class firstPass {
     };
     static regexi mojRegex;
 
+    // Labela
     static bool label(string line);
-    static string deleteLabelWithCommand(string line);
+    static string deleteLabelFromCommand(string line);
+    // Komentar
+    static string newLineWithoutComment(string line);
 
 public:
     static void testRegex();

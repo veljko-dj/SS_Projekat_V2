@@ -46,7 +46,9 @@ bool firstPass::label(string line) {
 
 }
 
-string firstPass::deleteLabelWithCommand(string line) {
+// Brise labelu iz reda koji sadrzi i labelu i komandu neku
+// Vraca "" ukoliko je to red samo sa labelom
+string firstPass::deleteLabelFromCommand(string line) {
     if (regex_match(line, mojRegex.labelLineOnly))
         return "";
     if (regex_match(line, mojRegex.labelLineWithCommand)) {
@@ -54,6 +56,13 @@ string firstPass::deleteLabelWithCommand(string line) {
         //cout << "NOVALINIJA" << endl << newLine << endl;
         return newLine;
     }
+}
+
+// Vraca liniju koda bez jednolinijskog komentara
+// Ukoliko ne pronadje # onda vraca ceo string jer nema komentara
+string firstPass::newLineWithoutComment(string line) {
+    string newLine = line.substr(0, line.find("#"));
+    return newLine;
 }
 
 void firstPass::testRegex() {
@@ -72,9 +81,11 @@ void firstPass::startFirstPass() {
     while (!MC::eofInput()) {	// do kraja fajla
 
         string line = MC::getInputLine();
-        cout << line << endl;
+        //cout << line << endl;
+        line = newLineWithoutComment(line);
+        //cout << "BEZ_KOMENTARA_: " << line << endl;
         if (label(line))
-            if (deleteLabelWithCommand(line) == "") continue;
+            if (deleteLabelFromCommand(line) == "") continue;
 
 
 

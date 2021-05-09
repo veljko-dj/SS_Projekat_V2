@@ -1,4 +1,4 @@
  asdasf: asd
-drugiRed: drugiRed
+drugiRed: drugiRed #komentar
 treciRed
-	cetRed4	:   
+	#cetRed4	:   
