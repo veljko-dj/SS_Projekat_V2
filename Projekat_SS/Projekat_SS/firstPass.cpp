@@ -17,9 +17,9 @@ using PT = ParsedTokens;
 using ST = SymbolTable;
 
 
-firstPass::regexi firstPass::mojRegex;
+FirstPass::regexi FirstPass::mojRegex;
 
-bool firstPass::label(string line) {
+bool FirstPass::label(string line) {
     smatch match;
 
     if (regex_match(line,mojRegex.labelLineOnly)
@@ -48,7 +48,7 @@ bool firstPass::label(string line) {
 
 // Brise labelu iz reda koji sadrzi i labelu i komandu neku
 // Vraca "" ukoliko je to red samo sa labelom
-string firstPass::deleteLabelFromCommand(string line) {
+string FirstPass::deleteLabelFromCommand(string line) {
     if (regex_match(line, mojRegex.labelLineOnly))
         return "";
     if (regex_match(line, mojRegex.labelLineWithCommand)) {
@@ -60,12 +60,12 @@ string firstPass::deleteLabelFromCommand(string line) {
 
 // Vraca liniju koda bez jednolinijskog komentara
 // Ukoliko ne pronadje # onda vraca ceo string jer nema komentara
-string firstPass::newLineWithoutComment(string line) {
+string FirstPass::newLineWithoutComment(string line) {
     string newLine = line.substr(0, line.find("#"));
     return newLine;
 }
 
-void firstPass::testRegex() {
+void FirstPass::testRegex() {
     string line;
     getline(MC::inputFile, line);
     cout << line<<endl;
@@ -76,7 +76,7 @@ void firstPass::testRegex() {
 
 }
 
-void firstPass::startFirstPass() {
+void FirstPass::startFirstPass() {
 
     while (!MC::eofInput()) {	// do kraja fajla
 

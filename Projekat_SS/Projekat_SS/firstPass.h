@@ -6,7 +6,7 @@
 #include <string>
 using namespace std;
 
-class firstPass {
+class FirstPass {
     struct regexi {
         // [ \t]* razmak(tab) 0 ili vise puta
         // \\w* slovo ili broj 0 ili vise puta. Sme da pocne velikim slovom
@@ -17,6 +17,8 @@ class firstPass {
             "^[ \t]*\\w*[ \t]*\\:[ \t]*.*" };
         regex identfier{						// rec, naziv ili sta god
             "[a-zA-Z]\\w*"};
+        regex global{
+            "\.global <lista_simbola>"};
     };
     static regexi mojRegex;
 
