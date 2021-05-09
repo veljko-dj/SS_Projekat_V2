@@ -18,6 +18,21 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Symbol.cpp" />
+    <ClCompile Include="firstPass.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainClass.cpp" />
+    <ClCompile Include="parsedTokens.cpp" />
+    <ClCompile Include="SymbolTable.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Symbol.h" />
+    <ClInclude Include="firstPass.h" />
+    <ClInclude Include="MainClass.h" />
+    <ClInclude Include="parsedTokens.h" />
+    <ClInclude Include="SymbolTable.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{5A7CAC6D-FD1D-492E-8F9A-C4D5D465B9A1}</ProjectGuid>
@@ -150,9 +165,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Projekat_SS.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
