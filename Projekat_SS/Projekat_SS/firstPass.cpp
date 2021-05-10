@@ -21,6 +21,10 @@ FirstPass::regexi FirstPass::mojRegex;
 string FirstPass::currSection = "undefined";
 int FirstPass::currOffset = 0;
 
+bool FirstPass::emptyLine(string line) {
+    return regex_match(line, mojRegex.emptyLine) ? true: false;
+}
+
 bool FirstPass::label(string line) {
     smatch match;
 
@@ -56,7 +60,7 @@ string FirstPass::deleteLabelFromCommand(string line) {
         return "";
     if (regex_match(line, mojRegex.labelLineWithCommand)) {
         string newLine = line.substr(1+line.find(":"));	//dodajem 1 da preskocim :
-        //cout << "NOVALINIJA" << endl << newLine << endl;
+        cout << "NOVALINIJA" << endl << newLine << endl;
         return newLine;
     }
     return "error"; // ovo postoji samo da bi se sklonio warning
@@ -139,7 +143,7 @@ bool FirstPass::sectionDirective(string line) {
         PT::addNextToken(PT::SECTION, match[0]);
         {
             // potrebno je prethodnoj sekciji upisati duzinu i tako to
-            currOffset = 333;
+            //currOffset = 333;
             Symbol*lastSect= ST::getLastSection();
             if (lastSect != nullptr) lastSect->setSize(currOffset);
             //privremeno resenje
@@ -186,6 +190,23 @@ bool FirstPass::wordDirective(string line) {
         return false;
 }
 
+bool FirstPass::skipDirective(string line) {
+    smatch match;
+
+    if (regex_match(line, mojRegex.skip)) {
+
+        line = line.substr(line.find(".skip") + 5);
+        regex_search(line, match, mojRegex.number);
+        PT::addNextToken(PT::SECTION, match[0]);
+        {
+            // Samo dodam na trenutni offset taj broj
+            currOffset += stoi(match[0]);
+        }
+        return true;
+    } else
+        return false;
+}
+
 void FirstPass::testRegex() {
     cout << endl << "____TESTREGEX____" << endl;
 
@@ -206,20 +227,29 @@ void FirstPass::testRegex() {
 }
 
 void FirstPass::startFirstPass() {
-
+    int numOfLines = 1;	// Nepotrebno (notepad++ krece od 1)
     while (!MC::eofInput()) {	// do kraja fajla
 
         string line = MC::getInputLine();
-        //cout << line << endl;
+        numOfLines++;
+        //cout << line << numOfLines<< endl;
         line = newLineWithoutComment(line);
         //cout << "BEZ_KOMENTARA_: " << line << endl;
         if (label(line))
-            if (deleteLabelFromCommand(line) == "") continue;
+            line = deleteLabelFromCommand(line);
+        if (emptyLine(line)) continue;
         if (globalDirective(line)) continue;
         if (externDirective(line)) continue;
         if (sectionDirective(line)) continue;
         if (wordDirective(line)) continue;
+        if (skipDirective(line)) continue;
 
+        {
+            //greska
+            cout << "\t ERROR: LEKSICKA GRESKA na liniji: " << numOfLines-1 << endl;
+            cout << "\t Sadrzaj linije je->" << line << endl;
+            exit(0);
+        }
 
     }
     cout << endl << "gotov Prvi prolaz";
