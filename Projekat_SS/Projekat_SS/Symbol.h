@@ -10,6 +10,7 @@ class Symbol {
     int value_offset;		// Section offset
     int size;		// Velicina u bajtovima
     char type;		// Tip, ne znam da li mi je ovo potrebno
+    // Za sada je l labela, s simbol, S sekcija
     bool isLocal;	// Da li je globalan ili lokalan simbol
     string section;	// Kako staviti sekciju? String/int/Section* ?
     // Za sada neka bude samo string

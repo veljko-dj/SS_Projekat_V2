@@ -26,5 +26,16 @@ void SymbolTable::printSymbolTable() {
 }
 
 int SymbolTable::getLastOrdNum() {
-    return table.back()->getOrdNum();
+    if (table.size() == 0) return 0;
+    else return table.back()->getOrdNum();
+}
+
+Symbol * SymbolTable::getLastSection() {
+    Symbol* last = nullptr;
+    if (table.size() > 0) {
+        list<Symbol*>::iterator it;
+        for (list<Symbol*>::iterator it = table.begin(); it != table.end(); ++it)
+            if ((*it)->getType() == 'S') last = (*it);
+    }
+    return last;
 }

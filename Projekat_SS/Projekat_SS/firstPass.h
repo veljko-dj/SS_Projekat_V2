@@ -21,8 +21,12 @@ class FirstPass {
             "[ \t]*\\.global[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$"};	// Ovde imas \\. umesto \.
         regex exterN{
             "[ \t]*\\.extern[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$" };	// kao i \\w umesto \w
+        regex section{
+            "[ \t]*\\.section[ \t]+\\w+[ \t]*$" };
     };
     static regexi mojRegex;
+    static string currSection;
+    static int currOffset;
 
     // Labela
     static bool label(string line);
@@ -33,6 +37,8 @@ class FirstPass {
     static bool globalDirective(string line);
     // extern direktiva
     static bool externDirective(string line);
+    // section direktiva
+    static bool sectionDirective(string line);
 
 public:
     static void testRegex();

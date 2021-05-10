@@ -11,5 +11,6 @@ public:
     static Symbol* getLastSymbol();
     static void  printSymbolTable();
     static int getLastOrdNum();
+    static Symbol* getLastSection();
 };
 

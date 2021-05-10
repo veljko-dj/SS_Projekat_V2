@@ -6,7 +6,9 @@
 using namespace std;
 
 list<ParsedTokens::Tok> ParsedTokens::tokenList ;
-string ParsedTokens::typeName[] = { "LABEL","IDENT", "GLOBAL", "EXTERN" };
+string ParsedTokens::typeName[] = { "LABEL","IDENT", "GLOBAL", "EXTERN"
+                                    , "SECTION"
+                                  };
 
 void ParsedTokens::addNextToken(Type t, string s) {
     Tok Tstruct;

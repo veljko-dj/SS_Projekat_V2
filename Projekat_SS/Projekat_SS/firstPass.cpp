@@ -18,6 +18,8 @@ using ST = SymbolTable;
 
 
 FirstPass::regexi FirstPass::mojRegex;
+string FirstPass::currSection = "undefined";
+int FirstPass::currOffset = 0;
 
 bool FirstPass::label(string line) {
     smatch match;
@@ -29,13 +31,14 @@ bool FirstPass::label(string line) {
         PT::addNextToken(PT::LABEL, match[0]);
         {
             //privremena resenja
-            int ord_num = 3;
-            int currOffset = 10;
-            int size = 4;
-            string currSection = "trenutnaSekcija";
+            int ord_num = ST::getLastOrdNum() + 1;
+            string name = match[0];
+            int size = 0;			// ne znam, logicno je da je nebitno
+            char type = 'l';		// simbol
+            bool isLocal = true;
             {
                 // Dodavanje u tabelu simbola
-                Symbol* sym = new Symbol(ord_num, match[0], currOffset, size, 'l', true, currSection);
+                Symbol* sym = new Symbol(ord_num, name, currOffset, size, type, isLocal, currSection);
                 ST::addSymbol(sym);
             }
         }
@@ -108,9 +111,7 @@ bool FirstPass::externDirective(string line) {
                     // vrednost 0, redni broj okej i GLOBAL je, sekcija UND
                     int ord_num = ST::getLastOrdNum()+1;
                     string name = ident;
-                    int currOffset = 0;		// nebitno
                     int size = 0;			// ne znam, logicno je da je nebitno
-                    string currSection = "UND"; // s vezbi
                     char type = 's';		// simbol
                     bool isLocal = false;
                     {
@@ -123,6 +124,38 @@ bool FirstPass::externDirective(string line) {
             line = match.suffix().str();	// bez ovoga vecna petlja
         }
 
+        return true;
+    } else
+        return false;
+}
+
+bool FirstPass::sectionDirective(string line) {
+    smatch match;
+
+    if (regex_match(line, mojRegex.section)) {
+
+        line = line.substr(line.find(".section") + 8);
+        regex_search(line, match, mojRegex.identfier);
+        PT::addNextToken(PT::SECTION, match[0]);
+        {
+            // potrebno je prethodnoj sekciji upisati duzinu i tako to
+            currOffset = 333;
+            Symbol*lastSect= ST::getLastSection();
+            if (lastSect != nullptr) lastSect->setSize(currOffset);
+            //privremeno resenje
+            int ord_num = ST::getLastOrdNum() + 1;
+            string name = match[0];
+            int size = 0;			// Za sada je nula jer tek ubacujemo
+            currSection = name;			// MENJAMO CURRSECTION
+            currOffset = 0;			//DA LI JE OVO POREBNO??????????????????????
+            char type = 'S';		// Sekcija
+            bool isLocal = true;
+            {
+                // Dodavanje u tabelu simbola
+                Symbol* sym = new Symbol(ord_num,name, currOffset, size, type, isLocal, currSection);
+                ST::addSymbol(sym);
+            }
+        }
         return true;
     } else
         return false;
@@ -159,6 +192,7 @@ void FirstPass::startFirstPass() {
             if (deleteLabelFromCommand(line) == "") continue;
         if (globalDirective(line)) continue;
         if (externDirective(line)) continue;
+        if (sectionDirective(line)) continue;
 
 
     }

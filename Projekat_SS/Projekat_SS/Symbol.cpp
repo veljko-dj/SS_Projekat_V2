@@ -18,8 +18,9 @@ string Symbol::toString() {
     abc += to_string(ord_num);
     //std::cout << "EEE" << ord_num;
     abc += " name: ";
-    abc += name;
-    abc += "\t\t value_offset: ";
+    string tmpName = name.insert(name.size(), 15 - name.size(), ' ');
+    abc += tmpName;
+    abc += "\t value_offset: ";
     abc += to_string( value_offset);
     abc += " size: ";
     abc += to_string(this->size);
