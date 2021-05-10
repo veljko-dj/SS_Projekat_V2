@@ -161,6 +161,31 @@ bool FirstPass::sectionDirective(string line) {
         return false;
 }
 
+bool FirstPass::wordDirective(string line) {
+    smatch match;
+
+    if (regex_match(line, mojRegex.word)) {
+
+        line = line.substr(line.find(".word") + 5);
+        PT::justCreateTokenWithNoValues(PT::WORD);
+        // pokupljen kod sa cplusplus.com regex_search
+        while (regex_search(line, match, mojRegex.identfier)) {
+            for (auto ident : match) {
+                PT::addValueToLastToken(ident);
+                {
+                    // Za sada samo odvajamo odredjeni prostor za svaki identifikator
+                    // i nista vise ne deluje da treba? Za sada je to to.
+                    currOffset += 2;
+                }
+            }
+            line = match.suffix().str();	// bez ovoga vecna petlja
+        }
+
+        return true;
+    } else
+        return false;
+}
+
 void FirstPass::testRegex() {
     cout << endl << "____TESTREGEX____" << endl;
 
@@ -193,6 +218,7 @@ void FirstPass::startFirstPass() {
         if (globalDirective(line)) continue;
         if (externDirective(line)) continue;
         if (sectionDirective(line)) continue;
+        if (wordDirective(line)) continue;
 
 
     }

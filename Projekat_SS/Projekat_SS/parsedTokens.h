@@ -7,7 +7,7 @@ using namespace std;
 
 class ParsedTokens {
 public:
-    enum Type { LABEL = 0, IDENT, GLOBAL, EXTERN, SECTION };
+    enum Type { LABEL = 0, IDENT, GLOBAL, EXTERN, SECTION, WORD };
     struct Tok {
         Type type;
         list<string> values;

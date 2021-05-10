@@ -1,6 +1,7 @@
 .section SEKCIJA1
 asdasf: asd
-drugiRed: drugiRed #komentar
+drugiRed:  #komentar
+.word i
 treciRed
 #cetRed4	:   
 	.global stagod
@@ -17,5 +18,5 @@ global asd, asd sd1
 	
  .extern e
 	.section imeSekcije
-	
+	.word ha
 .section Emee

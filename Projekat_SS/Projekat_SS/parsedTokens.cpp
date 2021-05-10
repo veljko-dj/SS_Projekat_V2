@@ -7,7 +7,7 @@ using namespace std;
 
 list<ParsedTokens::Tok> ParsedTokens::tokenList ;
 string ParsedTokens::typeName[] = { "LABEL","IDENT", "GLOBAL", "EXTERN"
-                                    , "SECTION"
+                                    , "SECTION", "WORD"
                                   };
 
 void ParsedTokens::addNextToken(Type t, string s) {

@@ -23,6 +23,8 @@ class FirstPass {
             "[ \t]*\\.extern[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$" };	// kao i \\w umesto \w
         regex section{
             "[ \t]*\\.section[ \t]+\\w+[ \t]*$" };
+        regex word{
+            "[ \t]*\\.word[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$" };	// kao i \\w umesto \w
     };
     static regexi mojRegex;
     static string currSection;
@@ -39,6 +41,8 @@ class FirstPass {
     static bool externDirective(string line);
     // section direktiva
     static bool sectionDirective(string line);
+    // word direktiva
+    static bool wordDirective(string line);
 
 public:
     static void testRegex();
