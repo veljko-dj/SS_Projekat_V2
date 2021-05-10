@@ -24,3 +24,7 @@ void SymbolTable::printSymbolTable() {
     for (list<Symbol*>::iterator it = table.begin(); it != table.end(); ++it)
         cout << (*it)->toString() << endl;
 }
+
+int SymbolTable::getLastOrdNum() {
+    return table.back()->getOrdNum();
+}

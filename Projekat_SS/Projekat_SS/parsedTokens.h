@@ -7,10 +7,10 @@ using namespace std;
 
 class ParsedTokens {
 public:
-    enum Type { LABEL = 0, IDENT };
+    enum Type { LABEL = 0, IDENT, GLOBAL, EXTERN };
     struct Tok {
         Type type;
-        string val;
+        list<string> values;
     };
 
 private:
@@ -20,6 +20,8 @@ private:
 
 public:
     static void addNextToken(Type, string);
+    static void addValueToLastToken(string);
+    static void justCreateTokenWithNoValues(Type);
     static void printParsedTokens();
 
 };

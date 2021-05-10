@@ -12,13 +12,15 @@ class FirstPass {
         // \\w* slovo ili broj 0 ili vise puta. Sme da pocne velikim slovom
         // [A-Za-z]* slova samo
         regex labelLineOnly{					//samo labela u redu
-            "^[ \t]*\\w*[ \t]*\\:[ \t]*$" };
+            "^[ \t]*\\w+[ \t]*\\:[ \t]*$" };
         regex labelLineWithCommand{				// labela pa bilo sta
-            "^[ \t]*\\w*[ \t]*\\:[ \t]*.*" };
+            "^[ \t]*\\w+[ \t]*\\:[ \t]*.*" };
         regex identfier{						// rec, naziv ili sta god
             "[a-zA-Z]\\w*"};
         regex global{
-            "\.global <lista_simbola>"};
+            "[ \t]*\\.global[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$"};	// Ovde imas \\. umesto \.
+        regex exterN{
+            "[ \t]*\\.extern[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$" };	// kao i \\w umesto \w
     };
     static regexi mojRegex;
 
@@ -27,6 +29,10 @@ class FirstPass {
     static string deleteLabelFromCommand(string line);
     // Komentar
     static string newLineWithoutComment(string line);
+    // global direktiva
+    static bool globalDirective(string line);
+    // extern direktiva
+    static bool externDirective(string line);
 
 public:
     static void testRegex();

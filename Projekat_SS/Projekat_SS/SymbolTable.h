@@ -10,5 +10,6 @@ public:
     static void addSymbol(Symbol* symbolPtr);
     static Symbol* getLastSymbol();
     static void  printSymbolTable();
+    static int getLastOrdNum();
 };
 

@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     ParsedTokens::printParsedTokens();
     SymbolTable::printSymbolTable();
 
-    OVDE UBACI POZIV TESTREGEX. DODAJ regex za global i nastavi da radis dalje
+    //FirstPass::testRegex();
 
     MainClass::assemblyDone();
     cout << endl << endl;
