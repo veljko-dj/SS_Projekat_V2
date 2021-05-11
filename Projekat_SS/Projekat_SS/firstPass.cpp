@@ -33,7 +33,7 @@ bool FirstPass::label(string line) {
         regex_search(line, match, mojRegex.identfier);
         //cout << "Labela :|" << match[0] << "|"<<endl;
         PT::addNextToken(PT::LABEL, match[0]);
-        {
+        if (ST::findSymbolByName(match[0]) == nullptr) {
             //privremena resenja
             int ord_num = ST::getLastOrdNum() + 1;
             string name = match[0];
@@ -45,6 +45,12 @@ bool FirstPass::label(string line) {
                 Symbol* sym = new Symbol(ord_num, name, currOffset, size, type, isLocal, currSection);
                 ST::addSymbol(sym);
             }
+        } else {
+            // Vec postoji u tabeli simbola? Kako zasto? Nisam jos siguran;
+            // Mozda treba da namestim offset a mozda je i greska.
+            // Za sada je greska !
+            cout << "ERROR: Vec postoji labela u tabeli simbola"<< endl;
+            exit(0);
         }
         return true;
     } else
@@ -169,11 +175,11 @@ bool FirstPass::wordDirective(string line) {
     smatch match;
 
     if (regex_match(line, mojRegex.word)) {
-
+        // Fali ti deo da inicijalizujes alocirani prostor ovim identifikatorima
         line = line.substr(line.find(".word") + 5);
         PT::justCreateTokenWithNoValues(PT::WORD);
         // pokupljen kod sa cplusplus.com regex_search
-        while (regex_search(line, match, mojRegex.identfier)) {
+        while (regex_search(line, match, mojRegex.identfierOrNumber)) {
             for (auto ident : match) {
                 PT::addValueToLastToken(ident);
                 {
@@ -207,6 +213,43 @@ bool FirstPass::skipDirective(string line) {
         return false;
 }
 
+bool FirstPass::equDirective(string line) {
+    smatch match;
+    smatch matchLit;
+    if (regex_match(line, mojRegex.equ)) {
+
+        line = line.substr(line.find(".equ") + 4);
+        regex_search(line, match, mojRegex.identfier);
+        regex_search(line, matchLit, mojRegex.number);
+
+        PT::justCreateTokenWithNoValues(PT::EQU);
+        PT::addValueToLastToken(match[0]);
+        PT::addValueToLastToken(matchLit[0]);
+        {
+            //privremena resenja
+            // Nisam siguran sta ovde treba raditi,
+            // na osnovu teksta zadatka, ubacicu u tabelu simbola,
+            // stavicu odgovarajucu sekciju i vrednost i boga pitaj sta dalje
+
+            int ord_num = ST::getLastOrdNum() + 1;
+            string name = match[0];
+            int size = 0;			// ne znam
+            char type = 'e';		// e kao simbol iz equ
+            bool isLocal = true;
+            int val_off = stoi(matchLit[0]);
+            string section = "absolute";
+            {
+                // Dodavanje u tabelu simbola
+                Symbol* sym = new Symbol(ord_num, name, val_off, size, type, isLocal, section);
+                ST::addSymbol(sym);
+            }
+        }
+        return true;
+    } else
+        return false;
+
+}
+
 void FirstPass::testRegex() {
     cout << endl << "____TESTREGEX____" << endl;
 
@@ -227,7 +270,7 @@ void FirstPass::testRegex() {
 }
 
 void FirstPass::startFirstPass() {
-    int numOfLines = 1;	// Nepotrebno (notepad++ krece od 1)
+    int numOfLines = 1;	// Ovo postoji samo zbog linije greske
     while (!MC::eofInput()) {	// do kraja fajla
 
         string line = MC::getInputLine();
@@ -243,6 +286,7 @@ void FirstPass::startFirstPass() {
         if (sectionDirective(line)) continue;
         if (wordDirective(line)) continue;
         if (skipDirective(line)) continue;
+        if (equDirective(line)) continue;
 
         {
             //greska

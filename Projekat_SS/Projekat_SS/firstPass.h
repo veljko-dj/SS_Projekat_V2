@@ -19,6 +19,8 @@ class FirstPass {
             "^[ \t]*\\w+[ \t]*\\:[ \t]*.*" };
         regex identfier{						// rec, naziv ili sta god
             "[a-zA-Z]\\w*"};
+        regex identfierOrNumber{
+            "\\w+" };
         regex number{							// broj
             "\\d+" };
         regex global{
@@ -31,6 +33,8 @@ class FirstPass {
             "[ \t]*\\.word[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$" };	// kao i \\w umesto \w
         regex skip{
             "[ \t]*\\.skip[ \t]+\\d+[ \t]*$" };
+        regex equ{
+            "[ \t]*\\.equ[ \t]+\\w+[ \t]*,[ \t]*\\d+[ \t]*$" };
     };
     static regexi mojRegex;
     static string currSection;
@@ -52,6 +56,8 @@ class FirstPass {
     static bool wordDirective(string line);
     // skip direktiva
     static bool skipDirective(string line);
+    // equ direktiva
+    static bool equDirective(string line);
 
 public:
     static void testRegex();

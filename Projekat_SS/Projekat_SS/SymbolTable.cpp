@@ -39,3 +39,13 @@ Symbol * SymbolTable::getLastSection() {
     }
     return last;
 }
+
+Symbol * SymbolTable::findSymbolByName(string name) {
+    Symbol* sym = nullptr;
+    for (list<Symbol*>::iterator it = table.begin(); it != table.end(); ++it)
+        if ((*it)->getName() == name) {
+            sym = (*it);
+            break;
+        }
+    return sym;
+}
