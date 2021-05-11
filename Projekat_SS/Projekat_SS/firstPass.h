@@ -35,10 +35,14 @@ class FirstPass {
             "[ \t]*\\.skip[ \t]+\\d+[ \t]*$" };
         regex equ{
             "[ \t]*\\.equ[ \t]+\\w+[ \t]*,[ \t]*\\d+[ \t]*$" };
+        regex end{
+            "[ \t]*\\.end[ \t]*$" };
     };
     static regexi mojRegex;
     static string currSection;
     static int currOffset;
+    static int numOfLine; // nepotrebno, cisto onako da znas
+    static bool end;
 
     static bool emptyLine(string line);
     // Labela
@@ -58,6 +62,8 @@ class FirstPass {
     static bool skipDirective(string line);
     // equ direktiva
     static bool equDirective(string line);
+    // end direktiva
+    static bool endDirective(string line);
 
 public:
     static void testRegex();

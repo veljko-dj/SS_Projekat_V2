@@ -20,6 +20,8 @@ using ST = SymbolTable;
 FirstPass::regexi FirstPass::mojRegex;
 string FirstPass::currSection = "undefined";
 int FirstPass::currOffset = 0;
+int FirstPass::numOfLine = 0;
+bool FirstPass::end = false;
 
 bool FirstPass::emptyLine(string line) {
     return regex_match(line, mojRegex.emptyLine) ? true: false;
@@ -33,6 +35,12 @@ bool FirstPass::label(string line) {
         regex_search(line, match, mojRegex.identfier);
         //cout << "Labela :|" << match[0] << "|"<<endl;
         PT::addNextToken(PT::LABEL, match[0]);
+        if (currSection=="undefined") { // greska
+            cout << "ERROR: Ne mozes da definies labelu ukoliko se"
+                 << "ne nalazis u nekoj sekciji" << endl << "\t A labela je: "
+                 << match[0] << " na liniji: "<< numOfLine <<endl;
+            exit(0);
+        }
         if (ST::findSymbolByName(match[0]) == nullptr) {
             //privremena resenja
             int ord_num = ST::getLastOrdNum() + 1;
@@ -50,6 +58,7 @@ bool FirstPass::label(string line) {
             // Mozda treba da namestim offset a mozda je i greska.
             // Za sada je greska !
             cout << "ERROR: Vec postoji labela u tabeli simbola"<< endl;
+            cout << "\t I to labela: " << match[0] <<" na liniji: "<< numOfLine<< endl;
             exit(0);
         }
         return true;
@@ -250,6 +259,13 @@ bool FirstPass::equDirective(string line) {
 
 }
 
+bool FirstPass::endDirective(string line) {
+    if (regex_match(line, mojRegex.end)) {
+        cout << "Prvi prolaz je zavrsen" << endl;
+        end = true;
+    }
+}
+
 void FirstPass::testRegex() {
     cout << endl << "____TESTREGEX____" << endl;
 
@@ -270,31 +286,33 @@ void FirstPass::testRegex() {
 }
 
 void FirstPass::startFirstPass() {
-    int numOfLines = 1;	// Ovo postoji samo zbog linije greske
     while (!MC::eofInput()) {	// do kraja fajla
 
         string line = MC::getInputLine();
-        numOfLines++;
+        numOfLine++;
         //cout << line << numOfLines<< endl;
         line = newLineWithoutComment(line);
         //cout << "BEZ_KOMENTARA_: " << line << endl;
-        if (label(line))
-            line = deleteLabelFromCommand(line);
-        if (emptyLine(line)) continue;
-        if (globalDirective(line)) continue;
-        if (externDirective(line)) continue;
-        if (sectionDirective(line)) continue;
-        if (wordDirective(line)) continue;
-        if (skipDirective(line)) continue;
-        if (equDirective(line)) continue;
+        if (!end) {
+            // Ako nije bila .end direktiva analiziraj dalje
+            // Ako jeste, samo kuliraj do citanja kraja fajla
+            if (label(line))
+                line = deleteLabelFromCommand(line);
+            if (emptyLine(line)) continue;
+            if (globalDirective(line)) continue;
+            if (externDirective(line)) continue;
+            if (sectionDirective(line)) continue;
+            if (wordDirective(line)) continue;
+            if (skipDirective(line)) continue;
+            if (equDirective(line)) continue;
 
-        {
-            //greska
-            cout << "\t ERROR: LEKSICKA GRESKA na liniji: " << numOfLines-1 << endl;
-            cout << "\t Sadrzaj linije je->" << line << endl;
-            exit(0);
+            {
+                //greska
+                cout << "\t ERROR: LEKSICKA GRESKA na liniji: " << numOfLine - 1 << endl;
+                cout << "\t Sadrzaj linije je->" << line << endl;
+                exit(0);
+            }
         }
-
     }
     cout << endl << "gotov Prvi prolaz";
 }
