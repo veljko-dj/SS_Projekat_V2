@@ -8,6 +8,7 @@
 #include <regex>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -26,6 +27,246 @@ bool FirstPass::end = false;
 bool FirstPass::emptyLine(string line) {
     return regex_match(line, mojRegex.emptyLine) ? true: false;
 }
+// Koristi se u oneOperand() i twoOperand()
+bool FirstPass::checkOperand(string line) {
+    smatch match;
+    int posOfPlus = 0;
+    //<reg>
+    regex_search(line, match, mojRegex.regDir);
+    if (match.size() > 0) {
+        currOffset += 2;
+        PT::addValueToLastToken("POD_REG_DIR");
+        PT::addValueToLastToken(match[0]);
+        return true;
+    }
+    line = line.substr(line.find_first_not_of(" \t"));	// cplusplus.com
+    string lineWithoutFirst = line.substr(1);
+
+    string  lineWithoutFirstAndSecond= (line.length()>2) ? line.substr(2) : "";
+    cout << "BEz prvog karaktera :" << lineWithoutFirst << endl;
+    cout << "BEz drugog karaktera :" << lineWithoutFirstAndSecond << endl;
+
+    switch (line[0]) {
+    case '$': // Znaci onda je neposredno?
+        // PODATAK: $<literal>
+        regex_search(lineWithoutFirst, match, mojRegex.literal);
+        if (match.size() > 0) {
+            PT::addValueToLastToken("POD_NEPOS_LIT");
+            PT::addValueToLastToken(match[0]);
+            currOffset += 5;
+            return true;
+        }
+        // PODATAK: $<simbol>
+        regex_search(lineWithoutFirst, match, mojRegex.simbol);
+        if (match.size() > 0) {
+            PT::addValueToLastToken("POD_NEPOS_SIM");
+            PT::addValueToLastToken(match[0]);
+            currOffset += 5;
+            return true;
+        }
+        cout << "\t ERROR: Neposredno, nit je literal nit je simbol  :" << line << endl
+             << "\t Na liniji: " << numOfLine << endl;
+        exit(0);
+
+    case '%': // Znaci onda je PC relativno?
+        // PODATAK_ADRESA : %<simbol>
+        regex_search(lineWithoutFirst, match, mojRegex.simbol);
+        if (match.size() > 0) {
+            PT::addValueToLastToken("PODiADR_PC_REL_SIM");
+            PT::addValueToLastToken(match[0]);
+            currOffset += 5;
+            return true;
+        }
+        cout << "\t ERROR: PC_REL_SIM -> Nije simbol :" << line << endl
+             << "\t Na liniji: " << numOfLine << endl;
+        exit(0);
+    case '[':
+        if (lineWithoutFirst.find_first_of(']') == string::npos) {
+            cout << "\t ERROR: Ne postoji i leva i desna zaagrada [] :" << line << endl
+                 << "\t Na liniji: " << numOfLine << endl;
+            exit(0);
+        }
+        lineWithoutFirst = lineWithoutFirst.substr(0, // Proveri keca, prepravljeno u 0
+                           lineWithoutFirst.find_first_of(']'));
+        // Ovde imas bug, ako imas [r0]adasda9 ne izbacuje gresku
+        cout << "BEZ UGLASTIH :" << lineWithoutFirst;
+        // PODATAK: [<reg>]
+        regex_search(lineWithoutFirst, match, mojRegex.regDir);
+        if (match.size() > 0) {
+            currOffset += 3;
+            PT::addValueToLastToken("POD_REG_IND_BEZ_POM");
+            PT::addValueToLastToken(match[0]);
+            return true;
+        }
+
+        posOfPlus = lineWithoutFirst.find_first_of('+');
+        if (posOfPlus == string::npos) {
+            cout << "\t ERROR: Ne postoji plus + :" << line << endl
+                 << "\t Na liniji: " << numOfLine << endl;
+            exit(0);
+        }
+        {
+            string beforePlus = lineWithoutFirst.substr(0, posOfPlus);
+            string afterPlus = lineWithoutFirst.substr(posOfPlus+1,
+                               lineWithoutFirst.length());
+
+            // PODATAK: [<reg>+...]
+            regex_search(beforePlus, match, mojRegex.regDir);
+            if (match.size() > 0) {
+                beforePlus = match[0];	// Privremeno sacuvano
+            } else {
+                cout << "\t ERROR:Pre + mora da bude regDir :" << line << endl
+                     << "\t Na liniji: " << numOfLine << endl;
+                exit(0);
+            }
+            // PODATAK: [<reg>+<literal>]
+            regex_search(afterPlus, match, mojRegex.literal);
+            if (match.size() > 0) {
+                PT::addValueToLastToken("POD_REG_DIR_PLUS_LIT");
+                PT::addValueToLastToken(beforePlus);
+                PT::addValueToLastToken(match[0]);
+                currOffset += 5;
+                return true;
+            } else {
+                // PODATAK: [<reg>+<simbol>]
+                regex_search(afterPlus, match, mojRegex.simbol);
+                if (match.size() > 0) {
+                    PT::addValueToLastToken("POD_REG_DIR_PLUS_SIM");
+                    PT::addValueToLastToken(beforePlus);
+                    PT::addValueToLastToken(match[0]);
+                    currOffset += 5;
+                    return true;
+                }
+                cout << "\t ERROR:posle + mora da bude literal ili simbol :" << line << endl
+                     << "\t Na liniji: " << numOfLine << endl;
+                exit(0);
+            }
+        }
+
+    case '*': // Znaci onda je?
+
+        // ADRESA :*<reg>		-> reg Direktno
+        regex_search(lineWithoutFirst, match, mojRegex.regDir);
+        if (match.size() > 0) {
+            PT::addValueToLastToken("ADR_REG_DIR");
+            PT::addValueToLastToken(match[0]);
+            currOffset += 2;
+            return true;
+        }
+        // ADRESA :*<literal>	-> memorijsko
+        regex_search(lineWithoutFirst, match, mojRegex.literal);
+        if (match.size() > 0) {
+            PT::addValueToLastToken("ADR_MEM_LIT");
+            PT::addValueToLastToken(match[0]);
+            currOffset += 5;
+            return true;
+        }
+        // ADRESA :*<simbol>	-> memorijsko
+        regex_search(lineWithoutFirst, match, mojRegex.simbol);
+        if (match.size() > 0) {
+            PT::addValueToLastToken("ADR_MEM_SIM");
+            PT::addValueToLastToken(match[0]);
+            currOffset += 5;
+            return true;
+        }
+
+        // ADRESA :*[...]
+        switch (lineWithoutFirst[0]) {
+        case '[':
+            if (lineWithoutFirstAndSecond.find_first_of(']') == string::npos) {
+                cout << "\t ERROR: Ne postoji i leva i desna zaagrada [] :" << line << endl
+                     << "\t Na liniji: " << numOfLine << endl;
+                exit(0);
+            }
+            lineWithoutFirstAndSecond = lineWithoutFirstAndSecond.substr(0, // Proveri keca
+                                        lineWithoutFirstAndSecond.find_first_of(']'));
+            cout << "BEZ UGLASTIH :" << lineWithoutFirstAndSecond;
+
+            // ADRESA :*[<reg>]
+            regex_search(lineWithoutFirstAndSecond, match, mojRegex.regDir);
+            if (match.size() > 0) {
+                currOffset += 3;
+                PT::addValueToLastToken("ADR_REG_IND_BEZ_POM");
+                PT::addValueToLastToken(match[0]);
+                return true;
+            }
+
+            posOfPlus = lineWithoutFirstAndSecond.find_first_of('+');
+            if (posOfPlus == string::npos) {
+                cout << "\t ERROR: Ne postoji plus + :" << line << endl
+                     << "\t Na liniji: " << numOfLine << endl;
+                exit(0);
+            }
+            {
+                string beforePlus = lineWithoutFirstAndSecond.substr(0, posOfPlus);
+                string afterPlus = lineWithoutFirstAndSecond.substr(posOfPlus+1,
+                                   lineWithoutFirstAndSecond.length());
+
+                // ADRESA :*[<reg>+...]
+                regex_search(beforePlus, match, mojRegex.regDir);
+                if (match.size() > 0) {
+                    beforePlus = match[0];	// Privremeno sacuvano
+                } else {
+                    cout << "\t ERROR:Pre + mora da bude regDir :" << line << endl
+                         << "\t Na liniji: " << numOfLine << endl;
+                    exit(0);
+                }
+                // ADRESA :*[<reg>+<literal>]
+                regex_search(afterPlus, match, mojRegex.literal);
+                if (match.size() > 0) {
+                    PT::addValueToLastToken("ADR_REG_DIR_PLUS_LIT");
+                    PT::addValueToLastToken(beforePlus);
+                    PT::addValueToLastToken(match[0]);
+                    currOffset += 5;
+                    return true;
+                } else {
+                    regex_search(afterPlus, match, mojRegex.simbol);
+                    if (match.size() > 0) {
+                        // ADRESA :*[<reg>+<simbol>]
+                        PT::addValueToLastToken("ADR_REG_DIR_PLUS_SIM");
+                        PT::addValueToLastToken(beforePlus);
+                        PT::addValueToLastToken(match[0]);
+                        currOffset += 5;
+                        return true;
+                    }
+                    cout << "\t ERROR:posle + mora da bude literal ili simbol :" << line << endl
+                         << "\t Na liniji: " << numOfLine << endl;
+                    exit(0);
+                }
+            }
+        default:
+            cout << "\t ERROR: Ko zna sta si ukucao ovde :" << line << endl
+                 << "\t Na liniji: " << numOfLine << endl;
+            exit(0);
+        }
+
+        cout << "\t ERROR:  operand ne valja :" << line << endl
+             << "\t Na liniji: " << numOfLine << endl;
+        exit(0);
+
+    default:
+        regex_search(line, match, mojRegex.literal);
+        if (match.size() > 0) {
+            PT::addValueToLastToken("LIT");
+            PT::addValueToLastToken(match[0]);
+            currOffset += 5;
+            return true;
+        } else {
+            regex_search(line, match, mojRegex.simbol);
+            if (match.size() > 0) {
+                // ADRESA :*[<reg>+<simbol>]
+                PT::addValueToLastToken("SIM");
+                PT::addValueToLastToken(match[0]);
+                currOffset += 5;
+                return true;
+            }
+        }
+        cout << "\t ERROR: ovo nije nista :" << line << endl
+             << "\t Na liniji: " << numOfLine << endl;
+        exit(0);
+
+    }
+}
 
 bool FirstPass::label(string line) {
     smatch match;
@@ -33,7 +274,7 @@ bool FirstPass::label(string line) {
     if (regex_match(line,mojRegex.labelLineOnly)
             || regex_match(line, mojRegex.labelLineWithCommand)) {
         regex_search(line, match, mojRegex.identfier);
-        //cout << "Labela :|" << match[0] << "|"<<endl;
+
         PT::addNextToken(PT::LABEL, match[0]);
         if (currSection=="undefined") { // greska
             cout << "ERROR: Ne mozes da definies labelu ukoliko se"
@@ -41,7 +282,14 @@ bool FirstPass::label(string line) {
                  << match[0] << " na liniji: "<< numOfLine <<endl;
             exit(0);
         }
-        if (ST::findSymbolByName(match[0]) == nullptr) {
+        if (ST::findSymbolByName(match[0]) != nullptr) {
+            // Vec postoji u tabeli simbola? Kako zasto?  Za sada je greska !
+            // Da li je neko mogao da kreira ulaz u tabeli? Global ne, to se radi
+            // u drugom prolazu, equ mozda? Nema smisla
+            cout << "ERROR: Vec postoji labela u tabeli simbola" << endl;
+            cout << "\t I to labela: " << match[0] << " na liniji: " << numOfLine << endl;
+            exit(0);
+        } else {
             //privremena resenja
             int ord_num = ST::getLastOrdNum() + 1;
             string name = match[0];
@@ -53,13 +301,6 @@ bool FirstPass::label(string line) {
                 Symbol* sym = new Symbol(ord_num, name, currOffset, size, type, isLocal, currSection);
                 ST::addSymbol(sym);
             }
-        } else {
-            // Vec postoji u tabeli simbola? Kako zasto? Nisam jos siguran;
-            // Mozda treba da namestim offset a mozda je i greska.
-            // Za sada je greska !
-            cout << "ERROR: Vec postoji labela u tabeli simbola"<< endl;
-            cout << "\t I to labela: " << match[0] <<" na liniji: "<< numOfLine<< endl;
-            exit(0);
         }
         return true;
     } else
@@ -135,7 +376,8 @@ bool FirstPass::externDirective(string line) {
                     bool isLocal = false;
                     {
                         // Dodavanje u tabelu simbola
-                        Symbol* sym = new Symbol(ord_num, name, currOffset, size, type, isLocal, currSection);
+                        Symbol* sym = new Symbol(ord_num, name, currOffset/*value*/,
+                                                 size, type, isLocal, currSection);
                         ST::addSymbol(sym);
                     }
                 }
@@ -156,11 +398,12 @@ bool FirstPass::sectionDirective(string line) {
         line = line.substr(line.find(".section") + 8);
         regex_search(line, match, mojRegex.identfier);
         PT::addNextToken(PT::SECTION, match[0]);
-        {
-            // potrebno je prethodnoj sekciji upisati duzinu i tako to
-            //currOffset = 333;
-            Symbol*lastSect= ST::getLastSection();
-            if (lastSect != nullptr) lastSect->setSize(currOffset);
+        // potrebno je prethodnoj sekciji upisati duzinu i tako to
+        //currOffset = 333;
+        if (currSection != "undefined") ST::findSymbolByName(currSection)->setSize(currOffset);
+        //Symbol*lastSect= ST::getLastSection();
+        //if (lastSect != nullptr) lastSect->setSize(currOffset);
+        if (ST::findSymbolByName(match[0]) == nullptr) {
             //privremeno resenje
             int ord_num = ST::getLastOrdNum() + 1;
             string name = match[0];
@@ -174,10 +417,35 @@ bool FirstPass::sectionDirective(string line) {
                 Symbol* sym = new Symbol(ord_num,name, currOffset, size, type, isLocal, currSection);
                 ST::addSymbol(sym);
             }
+        } else {
+            // Vec postoji u tabeli simbola? Kako zasto?  Za sada je greska !
+            // Mozda samo treba da se prebacis u tu sekciju i to je to
+            cout << "ERROR: Vec postoji sekcija u tabeli simbola" << endl;
+            cout << "\t I to sekcija: " << match[0] << " na liniji: " << numOfLine << endl;
+            exit(0);
+
         }
         return true;
     } else
         return false;
+}
+
+bool FirstPass::sectionDataDirective(string line) {
+    if (regex_match(line, mojRegex.dataSection))
+        return sectionDirective(".section data");
+    return false;
+}
+
+bool FirstPass::sectionTextDirective(string line) {
+    if (regex_match(line, mojRegex.textSection))
+        return sectionDirective(".section text");
+    return false;
+}
+
+bool FirstPass::sectionBssDirective(string line) {
+    if (regex_match(line, mojRegex.bssSection))
+        return sectionDirective(".section bss");
+    return false;
 }
 
 bool FirstPass::wordDirective(string line) {
@@ -212,7 +480,7 @@ bool FirstPass::skipDirective(string line) {
 
         line = line.substr(line.find(".skip") + 5);
         regex_search(line, match, mojRegex.number);
-        PT::addNextToken(PT::SECTION, match[0]);
+        PT::addNextToken(PT::SKIP, match[0]);
         {
             // Samo dodam na trenutni offset taj broj
             currOffset += stoi(match[0]);
@@ -239,18 +507,23 @@ bool FirstPass::equDirective(string line) {
             // Nisam siguran sta ovde treba raditi,
             // na osnovu teksta zadatka, ubacicu u tabelu simbola,
             // stavicu odgovarajucu sekciju i vrednost i boga pitaj sta dalje
-
-            int ord_num = ST::getLastOrdNum() + 1;
-            string name = match[0];
-            int size = 0;			// ne znam
-            char type = 'e';		// e kao simbol iz equ
-            bool isLocal = true;
-            int val_off = stoi(matchLit[0]);
-            string section = "absolute";
-            {
-                // Dodavanje u tabelu simbola
-                Symbol* sym = new Symbol(ord_num, name, val_off, size, type, isLocal, section);
-                ST::addSymbol(sym);
+            if (ST::findSymbolByName(match[0]) == nullptr) {
+                int ord_num = ST::getLastOrdNum() + 1;
+                string name = match[0];
+                int size = 0;			// ne znam
+                char type = 'e';		// e kao simbol iz equ
+                bool isLocal = true;
+                int val_off = stoi(matchLit[0]);
+                string section = "absolute";
+                {
+                    // Dodavanje u tabelu simbola
+                    Symbol* sym = new Symbol(ord_num, name, val_off, size, type, isLocal, section);
+                    ST::addSymbol(sym);
+                }
+            } else {
+                // Da li da postavim vrednost?? Hajde pa vidi posle sta ces
+                Symbol* s = ST::findSymbolByName(match[0]);
+                s->setValOff(stoi(matchLit[0]));
             }
         }
         return true;
@@ -262,32 +535,98 @@ bool FirstPass::equDirective(string line) {
 bool FirstPass::endDirective(string line) {
     if (regex_match(line, mojRegex.end)) {
         cout << "Prvi prolaz je zavrsen" << endl;
+        PT::addNextToken(PT::END,"_");
+        if (currSection != "undefined") ST::findSymbolByName(currSection)->setSize(currOffset);
+        //Symbol* lastSect = ST::getLastSection();
+        //if (lastSect != nullptr) lastSect->setSize(currOffset);
         end = true;
-    }
+        return true;
+    } else return false;
+}
+
+bool FirstPass::noOperInstr(string line) {
+    smatch match;
+    if (regex_match(line, mojRegex.noOper)) {
+        regex_search(line, match, mojRegex.identfier);
+        if (!(match[0] == "halt" || (match[0] == "iret") || (match[0] == "ret")))
+            return false;
+        PT::addNextToken(PT::INSTR0, match[0]);
+        currOffset += 1;			// velicina ovih instrukcija je 1B
+        return true;
+    } else return false;
+}
+
+bool FirstPass::oneOperInstr(string line) {
+    smatch match;
+    if (regex_match(line, mojRegex.oneOper)) {
+        regex_search(line, match, mojRegex.identfier);
+        if (!(match[0] == "int" || (match[0] == "call") || (match[0] == "jmp")
+                || (match[0] == "jeq") || (match[0] == "jne") || (match[0] == "jgt")
+                || (match[0] == "push") || (match[0] == "pop")))
+            return false;
+        PT::addNextToken(PT::INSTR1, match[0]);
+
+        line = line.substr(line.find(match[0]) + match[0].length());
+        return checkOperand(line);
+    } else return false;
+}
+
+bool FirstPass::twoOperInstr(string line) {
+    smatch match;
+    if (regex_match(line, mojRegex.twoOper)) {
+        regex_search(line, match, mojRegex.identfier);
+        if (!(match[0] == "push" || (match[0] == "pop") || (match[0] == "xchg")
+                || (match[0] == "add") || (match[0] == "sub") || (match[0] == "mul")
+                || (match[0] == "div") || (match[0] == "cmp") || (match[0] == "not")
+                || (match[0] == "and") || (match[0] == "or") || (match[0] == "xor")
+                || (match[0] == "test") || (match[0] == "shl") || (match[0] == "shr")
+                || (match[0] == "ldr") || (match[0] == "str") ))
+            return false;
+        PT::addNextToken(PT::INSTR2, match[0]);
+        line = line.substr(line.find(match[0]) + match[0].length());
+
+        int posOfComma = line.find_first_of(',');
+        string beforeComma = line.substr(0, posOfComma);
+        string afterComma = line.substr(posOfComma+1,
+                                        line.length());
+        //<reg>
+        regex_search(beforeComma, match, mojRegex.regDir);
+        if (match.size() > 0) {
+            PT::addValueToLastToken("PRVI_OPER(REG)");
+            PT::addValueToLastToken(match[0]);
+            return  checkOperand(afterComma);
+        }
+    } else return false;
 }
 
 void FirstPass::testRegex() {
     cout << endl << "____TESTREGEX____" << endl;
-
-
     while (!MC::eofInput()) {	// do kraja fajla
-
         string line = MC::getInputLine();
         cout << line << endl;
         line = newLineWithoutComment(line);
         //cout << "BEZ_KOMENTARA_: " << line << endl;
-
         if (std::regex_match(line, mojRegex.global))
             std::cout << "\t \t \t \t uspesno uparivanje regexa"<< endl;
         else
             cout << "\t \t \t \t \t \t \t neuspesno uparivanje regexa" << endl;
-
     }
 }
 
 void FirstPass::startFirstPass() {
+    // Da li je potrebno ubacivanje sekcije "undefined"?
+    {
+        int ord_num = 0;
+        string name = "undefined";
+        int size = 0;
+        char type = 'S';
+        bool isLocal = true;
+        {
+            Symbol* sym = new Symbol(ord_num, name, currOffset, size, type, isLocal, currSection);
+            ST::addSymbol(sym);
+        }
+    }
     while (!MC::eofInput()) {	// do kraja fajla
-
         string line = MC::getInputLine();
         numOfLine++;
         //cout << line << numOfLines<< endl;
@@ -302,9 +641,16 @@ void FirstPass::startFirstPass() {
             if (globalDirective(line)) continue;
             if (externDirective(line)) continue;
             if (sectionDirective(line)) continue;
+            if (sectionBssDirective(line)) continue;
+            if (sectionDataDirective(line)) continue;
+            if (sectionTextDirective(line)) continue;
             if (wordDirective(line)) continue;
             if (skipDirective(line)) continue;
             if (equDirective(line)) continue;
+            if (endDirective(line)) continue;
+            if (noOperInstr(line)) continue;
+            if (oneOperInstr(line)) continue;
+            if (twoOperInstr(line)) continue;
 
             {
                 //greska

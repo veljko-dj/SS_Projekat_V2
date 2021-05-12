@@ -2,10 +2,17 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 Symbol::Symbol(int o_n, string n, int v_o, int s, char t, bool l, string sec) {
     ord_num = o_n;
-    name = n;
+    {
+        //Ovo nije bas isproveravano ovde u simbolu
+        //Nemoj da ti pobrise nesto vise, mada ime ne sme da sastoji ' '
+        n.erase(remove(n.begin(), n.end(), ' '), n.end());
+        n.erase(remove(n.begin(), n.end(), '\t'), n.end());
+        name = n;
+    }
     value_offset = v_o;
     size = s;
     type = t;
