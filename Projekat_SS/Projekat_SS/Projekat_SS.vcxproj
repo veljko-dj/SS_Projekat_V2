@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SecondPass.cpp" />
     <ClCompile Include="Symbol.cpp" />
     <ClCompile Include="firstPass.cpp" />
     <ClCompile Include="main.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="SymbolTable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SecondPass.h" />
     <ClInclude Include="Symbol.h" />
     <ClInclude Include="firstPass.h" />
     <ClInclude Include="MainClass.h" />

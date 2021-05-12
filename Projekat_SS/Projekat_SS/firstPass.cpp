@@ -24,6 +24,12 @@ int FirstPass::currOffset = 0;
 int FirstPass::numOfLine = 0;
 bool FirstPass::end = false;
 
+void FirstPass::error(string msg, string line) {
+    cout << "\t ERROR: "<<msg<< " :" << line << endl
+         << "\t Na liniji: " << numOfLine << endl;
+    exit(0);
+}
+
 bool FirstPass::emptyLine(string line) {
     return regex_match(line, mojRegex.emptyLine) ? true: false;
 }
@@ -43,8 +49,6 @@ bool FirstPass::checkOperand(string line) {
     string lineWithoutFirst = line.substr(1);
 
     string  lineWithoutFirstAndSecond= (line.length()>2) ? line.substr(2) : "";
-    cout << "BEz prvog karaktera :" << lineWithoutFirst << endl;
-    cout << "BEz drugog karaktera :" << lineWithoutFirstAndSecond << endl;
 
     switch (line[0]) {
     case '$': // Znaci onda je neposredno?
@@ -64,9 +68,7 @@ bool FirstPass::checkOperand(string line) {
             currOffset += 5;
             return true;
         }
-        cout << "\t ERROR: Neposredno, nit je literal nit je simbol  :" << line << endl
-             << "\t Na liniji: " << numOfLine << endl;
-        exit(0);
+        error("Neposredno adr, mora biti ili simbol ili literal", line);
 
     case '%': // Znaci onda je PC relativno?
         // PODATAK_ADRESA : %<simbol>
@@ -77,19 +79,14 @@ bool FirstPass::checkOperand(string line) {
             currOffset += 5;
             return true;
         }
-        cout << "\t ERROR: PC_REL_SIM -> Nije simbol :" << line << endl
-             << "\t Na liniji: " << numOfLine << endl;
-        exit(0);
+        error("Sa % mora da ide iskljucivo simbol",line);
     case '[':
-        if (lineWithoutFirst.find_first_of(']') == string::npos) {
-            cout << "\t ERROR: Ne postoji i leva i desna zaagrada [] :" << line << endl
-                 << "\t Na liniji: " << numOfLine << endl;
-            exit(0);
-        }
+        if (lineWithoutFirst.find_first_of(']') == string::npos)
+            error("Ne postoje i leva i desna zaagrada [] :", line);
+
         lineWithoutFirst = lineWithoutFirst.substr(0, // Proveri keca, prepravljeno u 0
                            lineWithoutFirst.find_first_of(']'));
         // Ovde imas bug, ako imas [r0]adasda9 ne izbacuje gresku
-        cout << "BEZ UGLASTIH :" << lineWithoutFirst;
         // PODATAK: [<reg>]
         regex_search(lineWithoutFirst, match, mojRegex.regDir);
         if (match.size() > 0) {
@@ -100,12 +97,10 @@ bool FirstPass::checkOperand(string line) {
         }
 
         posOfPlus = lineWithoutFirst.find_first_of('+');
-        if (posOfPlus == string::npos) {
-            cout << "\t ERROR: Ne postoji plus + :" << line << endl
-                 << "\t Na liniji: " << numOfLine << endl;
-            exit(0);
-        }
+        if (posOfPlus == string::npos)
+            error("Ne postoji +, a nije samo <reg>", line);
         {
+            // Ovaj blok mora, jer ako nemas switch baca gresku nedef simbola
             string beforePlus = lineWithoutFirst.substr(0, posOfPlus);
             string afterPlus = lineWithoutFirst.substr(posOfPlus+1,
                                lineWithoutFirst.length());
@@ -114,11 +109,8 @@ bool FirstPass::checkOperand(string line) {
             regex_search(beforePlus, match, mojRegex.regDir);
             if (match.size() > 0) {
                 beforePlus = match[0];	// Privremeno sacuvano
-            } else {
-                cout << "\t ERROR:Pre + mora da bude regDir :" << line << endl
-                     << "\t Na liniji: " << numOfLine << endl;
-                exit(0);
-            }
+            } else
+                error("Pre + mora da bude regDir", line);
             // PODATAK: [<reg>+<literal>]
             regex_search(afterPlus, match, mojRegex.literal);
             if (match.size() > 0) {
@@ -137,9 +129,7 @@ bool FirstPass::checkOperand(string line) {
                     currOffset += 5;
                     return true;
                 }
-                cout << "\t ERROR:posle + mora da bude literal ili simbol :" << line << endl
-                     << "\t Na liniji: " << numOfLine << endl;
-                exit(0);
+                error("Posle + mora da bude literal ili simbol", line);
             }
         }
 
@@ -173,14 +163,10 @@ bool FirstPass::checkOperand(string line) {
         // ADRESA :*[...]
         switch (lineWithoutFirst[0]) {
         case '[':
-            if (lineWithoutFirstAndSecond.find_first_of(']') == string::npos) {
-                cout << "\t ERROR: Ne postoji i leva i desna zaagrada [] :" << line << endl
-                     << "\t Na liniji: " << numOfLine << endl;
-                exit(0);
-            }
+            if (lineWithoutFirstAndSecond.find_first_of(']') == string::npos)
+                error("Ne postoje i leva i desna zaagrada[]", line);
             lineWithoutFirstAndSecond = lineWithoutFirstAndSecond.substr(0, // Proveri keca
                                         lineWithoutFirstAndSecond.find_first_of(']'));
-            cout << "BEZ UGLASTIH :" << lineWithoutFirstAndSecond;
 
             // ADRESA :*[<reg>]
             regex_search(lineWithoutFirstAndSecond, match, mojRegex.regDir);
@@ -192,11 +178,8 @@ bool FirstPass::checkOperand(string line) {
             }
 
             posOfPlus = lineWithoutFirstAndSecond.find_first_of('+');
-            if (posOfPlus == string::npos) {
-                cout << "\t ERROR: Ne postoji plus + :" << line << endl
-                     << "\t Na liniji: " << numOfLine << endl;
-                exit(0);
-            }
+            if (posOfPlus == string::npos)
+                error("Ne postoji +, a nije samo <reg>", line);
             {
                 string beforePlus = lineWithoutFirstAndSecond.substr(0, posOfPlus);
                 string afterPlus = lineWithoutFirstAndSecond.substr(posOfPlus+1,
@@ -206,11 +189,8 @@ bool FirstPass::checkOperand(string line) {
                 regex_search(beforePlus, match, mojRegex.regDir);
                 if (match.size() > 0) {
                     beforePlus = match[0];	// Privremeno sacuvano
-                } else {
-                    cout << "\t ERROR:Pre + mora da bude regDir :" << line << endl
-                         << "\t Na liniji: " << numOfLine << endl;
-                    exit(0);
-                }
+                } else
+                    error("Pre + mora da bude regDir", line);
                 // ADRESA :*[<reg>+<literal>]
                 regex_search(afterPlus, match, mojRegex.literal);
                 if (match.size() > 0) {
@@ -229,20 +209,14 @@ bool FirstPass::checkOperand(string line) {
                         currOffset += 5;
                         return true;
                     }
-                    cout << "\t ERROR:posle + mora da bude literal ili simbol :" << line << endl
-                         << "\t Na liniji: " << numOfLine << endl;
-                    exit(0);
+                    error("Posle + mora da bude literal ili simbol", line);
                 }
             }
         default:
-            cout << "\t ERROR: Ko zna sta si ukucao ovde :" << line << endl
-                 << "\t Na liniji: " << numOfLine << endl;
-            exit(0);
+            error("Ko zna sta si ukucao u ovom redu", line);
         }
 
-        cout << "\t ERROR:  operand ne valja :" << line << endl
-             << "\t Na liniji: " << numOfLine << endl;
-        exit(0);
+        error("Operand ne valja", line);
 
     default:
         regex_search(line, match, mojRegex.literal);
@@ -261,9 +235,7 @@ bool FirstPass::checkOperand(string line) {
                 return true;
             }
         }
-        cout << "\t ERROR: ovo nije nista :" << line << endl
-             << "\t Na liniji: " << numOfLine << endl;
-        exit(0);
+        error("Operand nije ni simbol ni literal, niti pocinje karak znakom", line);
 
     }
 }
@@ -276,19 +248,14 @@ bool FirstPass::label(string line) {
         regex_search(line, match, mojRegex.identfier);
 
         PT::addNextToken(PT::LABEL, match[0]);
-        if (currSection=="undefined") { // greska
-            cout << "ERROR: Ne mozes da definies labelu ukoliko se"
-                 << "ne nalazis u nekoj sekciji" << endl << "\t A labela je: "
-                 << match[0] << " na liniji: "<< numOfLine <<endl;
-            exit(0);
-        }
+        if (currSection=="undefined")
+            error("Ne mozes da definies labelu ukoliko se"
+                  "ne nalazis u nekoj sekciji.", line);
         if (ST::findSymbolByName(match[0]) != nullptr) {
             // Vec postoji u tabeli simbola? Kako zasto?  Za sada je greska !
             // Da li je neko mogao da kreira ulaz u tabeli? Global ne, to se radi
             // u drugom prolazu, equ mozda? Nema smisla
-            cout << "ERROR: Vec postoji labela u tabeli simbola" << endl;
-            cout << "\t I to labela: " << match[0] << " na liniji: " << numOfLine << endl;
-            exit(0);
+            error("Vec postoji labela u tabeli simbola", line);
         } else {
             //privremena resenja
             int ord_num = ST::getLastOrdNum() + 1;
@@ -316,7 +283,6 @@ string FirstPass::deleteLabelFromCommand(string line) {
         return "";
     if (regex_match(line, mojRegex.labelLineWithCommand)) {
         string newLine = line.substr(1+line.find(":"));	//dodajem 1 da preskocim :
-        cout << "NOVALINIJA" << endl << newLine << endl;
         return newLine;
     }
     return "error"; // ovo postoji samo da bi se sklonio warning
@@ -420,9 +386,7 @@ bool FirstPass::sectionDirective(string line) {
         } else {
             // Vec postoji u tabeli simbola? Kako zasto?  Za sada je greska !
             // Mozda samo treba da se prebacis u tu sekciju i to je to
-            cout << "ERROR: Vec postoji sekcija u tabeli simbola" << endl;
-            cout << "\t I to sekcija: " << match[0] << " na liniji: " << numOfLine << endl;
-            exit(0);
+            error("Vec postoji sekcija u tabeli simbola", line);
 
         }
         return true;
@@ -534,7 +498,6 @@ bool FirstPass::equDirective(string line) {
 
 bool FirstPass::endDirective(string line) {
     if (regex_match(line, mojRegex.end)) {
-        cout << "Prvi prolaz je zavrsen" << endl;
         PT::addNextToken(PT::END,"_");
         if (currSection != "undefined") ST::findSymbolByName(currSection)->setSize(currOffset);
         //Symbol* lastSect = ST::getLastSection();
@@ -652,12 +615,8 @@ void FirstPass::startFirstPass() {
             if (oneOperInstr(line)) continue;
             if (twoOperInstr(line)) continue;
 
-            {
-                //greska
-                cout << "\t ERROR: LEKSICKA GRESKA na liniji: " << numOfLine - 1 << endl;
-                cout << "\t Sadrzaj linije je->" << line << endl;
-                exit(0);
-            }
+            error("Leksicka greska, nije ni jedna instrukcija", line);
+
         }
     }
     cout << endl << "gotov Prvi prolaz";

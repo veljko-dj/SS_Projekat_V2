@@ -7,6 +7,7 @@
 #include "firstPass.h"
 #include "parsedTokens.h"
 #include "SymbolTable.h"
+#include "SecondPass.h"
 
 using namespace std;
 
@@ -17,9 +18,14 @@ int main(int argc, char *argv[]) {
 
     MainClass::passArgAndOpenFiles(argc, argv);
     FirstPass::startFirstPass();
+    MainClass::firstPassDone_CloseInputFile();
 
     ParsedTokens::printParsedTokens();
     SymbolTable::printSymbolTable();
+
+    SecondPass::startSecondPass();
+
+
 
     //FirstPass::testRegex();
 

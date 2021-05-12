@@ -49,3 +49,10 @@ void ParsedTokens::printParsedTokens() {
         cout << endl;
     }
 }
+
+ParsedTokens::Tok ParsedTokens::getNextToken() {
+    // Brise, nema stampanja tokena posle drugog prolasa
+    Tok tmpTok = tokenList.front();
+    tokenList.pop_front();
+    return tmpTok;
+}

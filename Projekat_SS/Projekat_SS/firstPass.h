@@ -72,6 +72,8 @@ class FirstPass {
     static int currOffset;
     static int numOfLine; // nepotrebno, cisto onako da znas
     static bool end;
+    // Bilo kakva greska
+    static void error(string msg, string line);
 
     static bool emptyLine(string line);
     static bool checkOperand(string line);

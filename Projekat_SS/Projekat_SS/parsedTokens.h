@@ -29,6 +29,7 @@ public:
     static void addValueToLastToken(string);
     static void justCreateTokenWithNoValues(Type);
     static void printParsedTokens();
+    static Tok getNextToken();
 
 };
 

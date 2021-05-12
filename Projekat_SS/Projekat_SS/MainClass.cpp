@@ -23,12 +23,6 @@ void MainClass::openFiles(string input, string output) {
     outputFile << "Evo teksta";
 }
 
-//	Zatvara fajlove
-void MainClass::closeFiles() {
-    inputFile.close();
-    outputFile.close();
-}
-
 //	Proerava broj argumenata, da li je .s fajl i prosledjuje
 void MainClass::checkArg(int argc, char * argv[], string& inputStr, string& outputStr) {
     string opt = "-o";
@@ -71,8 +65,11 @@ void MainClass::passArgAndOpenFiles(int argc, char *argv[]) {
 }
 
 void MainClass::assemblyDone() {
-    inputFile.close();
     outputFile.close();
+}
+
+void MainClass::firstPassDone_CloseInputFile() {
+    inputFile.close();
 }
 
 string MainClass::getInputLine() {
