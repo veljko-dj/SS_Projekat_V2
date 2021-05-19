@@ -19,7 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="RelEntry.cpp" />
+    <ClCompile Include="RelTable.cpp" />
     <ClCompile Include="SecondPass.cpp" />
+    <ClCompile Include="Section.cpp" />
+    <ClCompile Include="SectionTable.cpp" />
     <ClCompile Include="Symbol.cpp" />
     <ClCompile Include="firstPass.cpp" />
     <ClCompile Include="main.cpp" />
@@ -28,7 +32,11 @@
     <ClCompile Include="SymbolTable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RelEntry.h" />
+    <ClInclude Include="RelTable.h" />
     <ClInclude Include="SecondPass.h" />
+    <ClInclude Include="Section.h" />
+    <ClInclude Include="SectionTable.h" />
     <ClInclude Include="Symbol.h" />
     <ClInclude Include="firstPass.h" />
     <ClInclude Include="MainClass.h" />

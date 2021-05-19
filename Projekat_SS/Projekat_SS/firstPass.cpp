@@ -236,7 +236,7 @@ bool FirstPass::checkOperand(string line) {
             }
         }
         error("Operand nije ni simbol ni literal, niti pocinje karak znakom", line);
-
+        return false;
     }
 }
 
@@ -559,7 +559,8 @@ bool FirstPass::twoOperInstr(string line) {
             PT::addValueToLastToken(match[0]);
             return  checkOperand(afterComma);
         }
-    } else return false;
+    }
+    return false;
 }
 
 void FirstPass::testRegex() {
@@ -578,6 +579,7 @@ void FirstPass::testRegex() {
 
 void FirstPass::startFirstPass() {
     // Da li je potrebno ubacivanje sekcije "undefined"?
+    // Pa po Sasinom predavanju jeste, da bi ostala ta nula viska
     {
         int ord_num = 0;
         string name = "undefined";

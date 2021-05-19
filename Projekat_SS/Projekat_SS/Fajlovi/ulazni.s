@@ -38,6 +38,7 @@ iret					#lc=11; ->sek2.size=11
 	int *[r0+123]
 #	int *[r0+asd]
 	shr r0, b
+	int $0x12 #PROVERI OVO  ! ! ! 
 	shr r0, *[r0+4.1]
 	
 	

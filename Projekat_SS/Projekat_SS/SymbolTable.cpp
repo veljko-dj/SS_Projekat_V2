@@ -15,7 +15,7 @@ void SymbolTable::addSymbol(Symbol * symbolPtr) {
 }
 
 Symbol* SymbolTable::getLastSymbol() {
-    if (table.size()>0) return table.back();
+    if (table.size() > 0) return table.back();
     return nullptr;
 }
 

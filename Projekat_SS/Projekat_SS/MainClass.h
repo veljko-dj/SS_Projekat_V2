@@ -1,5 +1,6 @@
 #pragma once
 #ifndef MAINCLASS_H
+#define MAINCLASS_H
 
 #include <string>
 

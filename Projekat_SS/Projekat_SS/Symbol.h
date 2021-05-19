@@ -1,4 +1,8 @@
 #pragma once
+#ifndef SYMBOL_H
+#define SYMBOL_H
+
+
 #include <string>
 using namespace std;
 class Section;
@@ -41,3 +45,5 @@ public:
 };
 // U tabeli simbola na 13 str vidimo da prvi ulaz je neki UNDEFINED
 
+
+#endif // !SYMBOL_H

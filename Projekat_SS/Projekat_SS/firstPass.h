@@ -1,5 +1,6 @@
 #pragma once
 #ifndef FIRSTPASS_H
+#define FIRSTPASS_H
 
 #include <regex>
 #include <iostream>

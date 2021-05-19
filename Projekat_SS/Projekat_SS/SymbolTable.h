@@ -1,4 +1,8 @@
 #pragma once
+#ifndef SYMBOL_TABLE_H
+#define SYMBOL_TABLE_H
+
+
 #include <list>
 using namespace std;
 
@@ -15,3 +19,5 @@ public:
     static Symbol* findSymbolByName(string name);
 };
 
+
+#endif // !SYMBOL_TABLE_H
