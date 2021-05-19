@@ -15,4 +15,5 @@ void SecondPass::error(string msg, string line) {
 void SecondPass::startSecondPass() {
     cout << endl<<endl<<
          "Poceo je drugi prolaz" << endl;
+
 }

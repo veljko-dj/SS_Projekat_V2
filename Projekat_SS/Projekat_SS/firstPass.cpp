@@ -247,7 +247,7 @@ bool FirstPass::label(string line) {
             || regex_match(line, mojRegex.labelLineWithCommand)) {
         regex_search(line, match, mojRegex.identfier);
 
-        PT::addNextToken(PT::LABEL, match[0]);
+        PT::addNextToken(PT::LABEL, match[0], numOfLine);
         if (currSection=="undefined")
             error("Ne mozes da definies labelu ukoliko se"
                   "ne nalazis u nekoj sekciji.", line);
@@ -301,7 +301,7 @@ bool FirstPass::globalDirective(string line) {
     if (regex_match(line, mojRegex.global)) {
         // Uklanjanje global
         line = line.substr(line.find(".global")+7);
-        PT::justCreateTokenWithNoValues(PT::GLOBAL);
+        PT::justCreateTokenWithNoValues(PT::GLOBAL, numOfLine);
         // pokupljen kod sa cplusplus.com regex_search
         while (regex_search(line, match, mojRegex.identfier)) {
             for (auto ident : match) {
@@ -326,7 +326,7 @@ bool FirstPass::externDirective(string line) {
         // (https://www.magmath.com/english/programming/c_programming_language/projects/two_pass_assembler.php)
 
         line = line.substr(line.find(".extern") + 7);
-        PT::justCreateTokenWithNoValues(PT::EXTERN);
+        PT::justCreateTokenWithNoValues(PT::EXTERN, numOfLine);
         // pokupljen kod sa cplusplus.com regex_search
         while (regex_search(line, match, mojRegex.identfier)) {
             for (auto ident : match) {
@@ -363,7 +363,7 @@ bool FirstPass::sectionDirective(string line) {
 
         line = line.substr(line.find(".section") + 8);
         regex_search(line, match, mojRegex.identfier);
-        PT::addNextToken(PT::SECTION, match[0]);
+        PT::addNextToken(PT::SECTION, match[0], numOfLine);
         // potrebno je prethodnoj sekciji upisati duzinu i tako to
         //currOffset = 333;
         if (currSection != "undefined") ST::findSymbolByName(currSection)->setSize(currOffset);
@@ -418,7 +418,7 @@ bool FirstPass::wordDirective(string line) {
     if (regex_match(line, mojRegex.word)) {
         // Fali ti deo da inicijalizujes alocirani prostor ovim identifikatorima
         line = line.substr(line.find(".word") + 5);
-        PT::justCreateTokenWithNoValues(PT::WORD);
+        PT::justCreateTokenWithNoValues(PT::WORD, numOfLine);
         // pokupljen kod sa cplusplus.com regex_search
         while (regex_search(line, match, mojRegex.identfierOrNumber)) {
             for (auto ident : match) {
@@ -444,7 +444,7 @@ bool FirstPass::skipDirective(string line) {
 
         line = line.substr(line.find(".skip") + 5);
         regex_search(line, match, mojRegex.number);
-        PT::addNextToken(PT::SKIP, match[0]);
+        PT::addNextToken(PT::SKIP, match[0], numOfLine);
         {
             // Samo dodam na trenutni offset taj broj
             currOffset += stoi(match[0]);
@@ -463,7 +463,7 @@ bool FirstPass::equDirective(string line) {
         regex_search(line, match, mojRegex.identfier);
         regex_search(line, matchLit, mojRegex.number);
 
-        PT::justCreateTokenWithNoValues(PT::EQU);
+        PT::justCreateTokenWithNoValues(PT::EQU, numOfLine);
         PT::addValueToLastToken(match[0]);
         PT::addValueToLastToken(matchLit[0]);
         {
@@ -498,7 +498,7 @@ bool FirstPass::equDirective(string line) {
 
 bool FirstPass::endDirective(string line) {
     if (regex_match(line, mojRegex.end)) {
-        PT::addNextToken(PT::END,"_");
+        PT::addNextToken(PT::END,"_", numOfLine);
         if (currSection != "undefined") ST::findSymbolByName(currSection)->setSize(currOffset);
         //Symbol* lastSect = ST::getLastSection();
         //if (lastSect != nullptr) lastSect->setSize(currOffset);
@@ -513,7 +513,7 @@ bool FirstPass::noOperInstr(string line) {
         regex_search(line, match, mojRegex.identfier);
         if (!(match[0] == "halt" || (match[0] == "iret") || (match[0] == "ret")))
             return false;
-        PT::addNextToken(PT::INSTR0, match[0]);
+        PT::addNextToken(PT::INSTR0, match[0], numOfLine);
         currOffset += 1;			// velicina ovih instrukcija je 1B
         return true;
     } else return false;
@@ -527,7 +527,7 @@ bool FirstPass::oneOperInstr(string line) {
                 || (match[0] == "jeq") || (match[0] == "jne") || (match[0] == "jgt")
                 || (match[0] == "push") || (match[0] == "pop")))
             return false;
-        PT::addNextToken(PT::INSTR1, match[0]);
+        PT::addNextToken(PT::INSTR1, match[0], numOfLine);
 
         line = line.substr(line.find(match[0]) + match[0].length());
         return checkOperand(line);
@@ -545,7 +545,7 @@ bool FirstPass::twoOperInstr(string line) {
                 || (match[0] == "test") || (match[0] == "shl") || (match[0] == "shr")
                 || (match[0] == "ldr") || (match[0] == "str") ))
             return false;
-        PT::addNextToken(PT::INSTR2, match[0]);
+        PT::addNextToken(PT::INSTR2, match[0], numOfLine);
         line = line.substr(line.find(match[0]) + match[0].length());
 
         int posOfComma = line.find_first_of(',');

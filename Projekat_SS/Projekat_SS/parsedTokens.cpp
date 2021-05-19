@@ -17,9 +17,10 @@ string ParsedTokens::typeName[] = { "LABEL","IDENT", "GLOBAL", "EXTERN", "SECTIO
                                     //"AND", "OR", "XOR", "TEST", "SHL", "SHR", "LDR", "STR"
                                   };
 
-void ParsedTokens::addNextToken(Type t, string s) {
+void ParsedTokens::addNextToken(Type t, string s, int numOfLinee) {
     Tok Tstruct;
     Tstruct.type = t;
+    Tstruct.numOfLine = numOfLinee;
     s.erase(remove(s.begin(), s.end(), ' '), s.end());
     s.erase(remove(s.begin(), s.end(), '\t'), s.end());
     Tstruct.values.push_back(s);
@@ -32,9 +33,10 @@ void ParsedTokens::addValueToLastToken(string s) {
     tokenList.back().values.push_back(s);
 }
 
-void ParsedTokens::justCreateTokenWithNoValues(Type t) {
+void ParsedTokens::justCreateTokenWithNoValues(Type t, int num) {
     Tok Tstruct;
     Tstruct.type = t;
+    Tstruct.numOfLine = num;
     tokenList.push_back(Tstruct);
 }
 
@@ -42,7 +44,7 @@ void ParsedTokens::justCreateTokenWithNoValues(Type t) {
 void ParsedTokens::printParsedTokens() {
     cout << endl << endl << "____PARSED_TOKENS_____" << endl;
     for (list<Tok>::iterator it = tokenList.begin(); it != tokenList.end(); ++it) {
-        cout   <<setw(13)<< typeName[(*it).type] <<" -> ";
+        cout   <<setw(13)<< typeName[(*it).type] <<":"<< setw(2)<<(*it).numOfLine <<" -> ";
         for (auto const &i : (*it).values) {
             std::cout << i <<" - ";
         }

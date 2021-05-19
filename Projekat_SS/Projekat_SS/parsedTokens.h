@@ -15,6 +15,7 @@ public:
     struct Tok {
         Type type;
         list<string> values;
+        int numOfLine;
     };
     // Kod instrukcija je za sada plan da tip bude INSTR, a da values budu tokeni
     // koliko ima parametara proveravamo kao values.size()==1 2 3 itd.
@@ -25,9 +26,9 @@ private:
 
 
 public:
-    static void addNextToken(Type, string);
+    static void addNextToken(Type, string,int);
     static void addValueToLastToken(string);
-    static void justCreateTokenWithNoValues(Type);
+    static void justCreateTokenWithNoValues(Type, int);
     static void printParsedTokens();
     static Tok getNextToken();
 
