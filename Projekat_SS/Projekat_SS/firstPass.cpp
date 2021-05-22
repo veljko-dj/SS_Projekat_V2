@@ -25,7 +25,7 @@ int FirstPass::numOfLine = 0;
 bool FirstPass::end = false;
 
 void FirstPass::error(string msg, string line) {
-    cout << "\t ERROR: "<<msg<< " :" << line << endl
+    cout << "\t ERROR: FP:"<<msg<< " :" << line << endl
          << "\t Na liniji: " << numOfLine << endl;
     exit(0);
 }
@@ -140,7 +140,7 @@ bool FirstPass::checkOperand(string line) {
         if (match.size() > 0) {
             PT::addValueToLastToken("ADR_REG_DIR");
             PT::addValueToLastToken(match[0]);
-            currOffset += 2;
+            currOffset += 3;
             return true;
         }
         // ADRESA :*<literal>	-> memorijsko
@@ -337,12 +337,12 @@ bool FirstPass::externDirective(string line) {
                     // vrednost 0, redni broj okej i GLOBAL je, sekcija UND
                     int ord_num = ST::getLastOrdNum()+1;
                     string name = ident;
-                    int size = 0;			// ne znam, logicno je da je nebitno
+                    int size = 0;			// nebitno za simbol
                     char type = 's';		// simbol
                     bool isLocal = false;
                     {
                         // Dodavanje u tabelu simbola
-                        Symbol* sym = new Symbol(ord_num, name, currOffset/*value*/,
+                        Symbol* sym = new Symbol(ord_num, name, 0/*ne znamo*/,
                                                  size, type, isLocal, currSection);
                         ST::addSymbol(sym);
                     }
@@ -375,7 +375,7 @@ bool FirstPass::sectionDirective(string line) {
             string name = match[0];
             int size = 0;			// Za sada je nula jer tek ubacujemo
             currSection = name;			// MENJAMO CURRSECTION
-            currOffset = 0;			//DA LI JE OVO POREBNO??????????????????????
+            currOffset = 0;
             char type = 'S';		// Sekcija
             bool isLocal = true;
             {
@@ -422,6 +422,10 @@ bool FirstPass::wordDirective(string line) {
         // pokupljen kod sa cplusplus.com regex_search
         while (regex_search(line, match, mojRegex.identfierOrNumber)) {
             for (auto ident : match) {
+                if (regex_match( (string)ident, mojRegex.literal))
+                    PT::addValueToLastToken("NUM");
+                else
+                    PT::addValueToLastToken("SYM");
                 PT::addValueToLastToken(ident);
                 {
                     // Za sada samo odvajamo odredjeni prostor za svaki identifikator
@@ -467,7 +471,6 @@ bool FirstPass::equDirective(string line) {
         PT::addValueToLastToken(match[0]);
         PT::addValueToLastToken(matchLit[0]);
         {
-            //privremena resenja
             // Nisam siguran sta ovde treba raditi,
             // na osnovu teksta zadatka, ubacicu u tabelu simbola,
             // stavicu odgovarajucu sekciju i vrednost i boga pitaj sta dalje
@@ -475,10 +478,12 @@ bool FirstPass::equDirective(string line) {
                 int ord_num = ST::getLastOrdNum() + 1;
                 string name = match[0];
                 int size = 0;			// ne znam
-                char type = 'e';		// e kao simbol iz equ
+                char type = 's';		// e kao simbol iz equ
                 bool isLocal = true;
                 int val_off = stoi(matchLit[0]);
                 string section = "absolute";
+                // "absolute" -> Predavanja -> str 12(85/349)
+                // Apsolutnim simbolima ne treba relokacija
                 {
                     // Dodavanje u tabelu simbola
                     Symbol* sym = new Symbol(ord_num, name, val_off, size, type, isLocal, section);
@@ -530,6 +535,12 @@ bool FirstPass::oneOperInstr(string line) {
         PT::addNextToken(PT::INSTR1, match[0], numOfLine);
 
         line = line.substr(line.find(match[0]) + match[0].length());
+        {
+            // Ovo je dodato kasnije, kad sam skontao da push i pop nisu 2 bajta
+            // vec su 3 bajta
+            if (match[0] == "push" | match[0] == "pop")
+                currOffset += 1; // a posle poveca za jos 2
+        }
         return checkOperand(line);
     } else return false;
 }

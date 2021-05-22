@@ -9,14 +9,14 @@ class Section;
 // Ime klase kao i sama klasa pokupljeni su sa predavanja
 // strana 12/13
 class Symbol {
-    int ord_num;
-    string name;	// Ime sekcije
+    int ord_num;			// Rbr simbola
+    string name;			// Ime simbola
     int value_offset;		// Section offset
-    int size;		// Velicina u bajtovima
-    char type;		// Tip, ne znam da li mi je ovo potrebno
+    int size;				// Velicina u bajtovima, samo za sekcije
+    char type;				// Tip, ne znam da li mi je ovo potrebno
     // Za sada je l labela, s simbol, S sekcija
-    bool isLocal;	// Da li je globalan ili lokalan simbol
-    string section;	// Kako staviti sekciju? String/int/Section* ?
+    bool isLocal;			// Da li je globalan ili lokalan simbol
+    string section;			// Kako staviti sekciju? String/int/Section* ?
     // Za sada neka bude samo string
 
 public:
@@ -32,7 +32,7 @@ public:
     int getSize();
     char getType();
     bool getIsLocal();
-    string getSection();
+    string getSectionName();
     //setters
     void setOrdNum(int s);
     void setName(string n);

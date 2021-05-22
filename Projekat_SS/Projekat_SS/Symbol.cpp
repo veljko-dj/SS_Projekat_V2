@@ -65,7 +65,7 @@ bool Symbol::getIsLocal() {
     return isLocal;
 }
 
-string Symbol::getSection() {
+string Symbol::getSectionName() {
     return section;
 }
 

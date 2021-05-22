@@ -8,6 +8,7 @@
 #include "parsedTokens.h"
 #include "SymbolTable.h"
 #include "SecondPass.h"
+#include "RelTable.h"
 
 using namespace std;
 
@@ -24,6 +25,9 @@ int main(int argc, char *argv[]) {
     SymbolTable::printSymbolTable();
 
     SecondPass::startSecondPass();
+
+    RelTable::printRelTable();
+
 
 
 

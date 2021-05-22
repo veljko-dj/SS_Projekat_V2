@@ -10,9 +10,10 @@ class RelTable {
 
 public:
     static void addEntry(RelEntry* symbolPtr);
+    static int getLastOrdNum();
     static RelEntry* getLastEntry();
     static void  printRelTable();
-    static RelEntry* findRelEntryById(int id);
+    static RelEntry* findRelEntryByOrdNum(int id);
 
 };
 

@@ -5,13 +5,20 @@
 #include <string>
 using namespace std;
 
+class Section;
 class SecondPass {
 
-    static string currSection;
+    static string currSectionName;
+    static int currSecNum;
+    static Section* currSection;
     static int currOffset;
-    static int numOfToken; // nepotrebno, cisto onako da znas
+    static bool end;
 
-    static void error(string msg, string line);
+    static void error(string msg, int numOfLine);
+//    static void instr0( int token);
+//    static void instr1( int token);
+//    static void instr2( int token);
+
 
 public:
     static void startSecondPass();

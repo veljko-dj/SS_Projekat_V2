@@ -16,6 +16,7 @@ public:
         Type type;
         list<string> values;
         int numOfLine;
+        string getFrontValue();
     };
     // Kod instrukcija je za sada plan da tip bude INSTR, a da values budu tokeni
     // koliko ima parametara proveravamo kao values.size()==1 2 3 itd.
@@ -31,6 +32,7 @@ public:
     static void justCreateTokenWithNoValues(Type, int);
     static void printParsedTokens();
     static Tok getNextToken();
+    static int isEmpty();
 
 };
 

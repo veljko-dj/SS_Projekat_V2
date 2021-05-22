@@ -40,7 +40,6 @@ void ParsedTokens::justCreateTokenWithNoValues(Type t, int num) {
     tokenList.push_back(Tstruct);
 }
 
-
 void ParsedTokens::printParsedTokens() {
     cout << endl << endl << "____PARSED_TOKENS_____" << endl;
     for (list<Tok>::iterator it = tokenList.begin(); it != tokenList.end(); ++it) {
@@ -57,4 +56,15 @@ ParsedTokens::Tok ParsedTokens::getNextToken() {
     Tok tmpTok = tokenList.front();
     tokenList.pop_front();
     return tmpTok;
+}
+
+int ParsedTokens::isEmpty() {
+    return tokenList.empty();
+}
+
+string ParsedTokens::Tok::getFrontValue() {
+    if (this->values.empty()) return nullptr;
+    string tmp = this->values.front();
+    this->values.pop_front();
+    return tmp;
 }
