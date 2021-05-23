@@ -83,6 +83,8 @@ bool FirstPass::checkOperand(string line) {
     case '[':
         if (lineWithoutFirst.find_first_of(']') == string::npos)
             error("Ne postoje i leva i desna zaagrada [] :", line);
+        if (!emptyLine(lineWithoutFirst.substr(lineWithoutFirst.find_first_of(']') + 1)))
+            error("Posle ] imas jos nesto", line);
 
         lineWithoutFirst = lineWithoutFirst.substr(0, // Proveri keca, prepravljeno u 0
                            lineWithoutFirst.find_first_of(']'));
@@ -165,6 +167,9 @@ bool FirstPass::checkOperand(string line) {
         case '[':
             if (lineWithoutFirstAndSecond.find_first_of(']') == string::npos)
                 error("Ne postoje i leva i desna zaagrada[]", line);
+            if (!emptyLine(lineWithoutFirst.substr(lineWithoutFirst.find_first_of(']') + 1)))
+                error("Posle ] imas jos nesto", line);
+
             lineWithoutFirstAndSecond = lineWithoutFirstAndSecond.substr(0, // Proveri keca
                                         lineWithoutFirstAndSecond.find_first_of(']'));
 
@@ -566,7 +571,7 @@ bool FirstPass::twoOperInstr(string line) {
         //<reg>
         regex_search(beforeComma, match, mojRegex.regDir);
         if (match.size() > 0) {
-            PT::addValueToLastToken("PRVI_OPER(REG)");
+            //PT::addValueToLastToken("PRVI_OPER(REG)");
             PT::addValueToLastToken(match[0]);
             return  checkOperand(afterComma);
         }

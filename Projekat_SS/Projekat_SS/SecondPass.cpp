@@ -34,19 +34,19 @@ void SecondPass::error(string msg, int numOfLine) {
     exit(0);
 }
 
-void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOfLinee) {
+void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOfLinee, int minusValueForPcRel) {
     Symbol* sym = ST::findSymbolByName(nameOfSymbol);
     if (sym == nullptr) SecondPass::error("Simbol nije definisan", numOfLinee);
     // Da li je definisan, da li je globalan, sta radit? Da li je ABS?
     if (sym->getSectionName().compare("absolute") == 0)
-        currSection->setWordInMemoryAt(currOffset, sym->getValOff());
+        currSection->setWordInMemoryAt(currOffset, sym->getValOff()- minusValueForPcRel);
     else if (sym->getIsLocal()) { // trebalo bi da je vec definisan
         // Ako je lokalan, onda upisujem taj offset na to mesto i
         // dodajem rel zapis u koji staljam sekciju te ce se adresa
         // te sekcije samo dodati posle
         int sectionToZakrpiti = ST::findSymbolByName(sym->getSectionName())->getOrdNum();
 
-        currSection->setWordInMemoryAt(currOffset, sym->getValOff());
+        currSection->setWordInMemoryAt(currOffset, sym->getValOff() - minusValueForPcRel);
         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                           RT::getLastOrdNum() + 1, currOffset,
                                           RelEntry::R_X86_64_16, sectionToZakrpiti);
@@ -58,7 +58,7 @@ void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOf
         // novom adresom tog globalnog
         int sectionToZakrpiti = ST::findSymbolByName(sym->getSectionName())->getOrdNum();
 
-        currSection->setWordInMemoryAt(currOffset, sym->getValOff());
+        currSection->setWordInMemoryAt(currOffset, sym->getValOff() - minusValueForPcRel);
         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                           RT::getLastOrdNum() + 1, currOffset,
                                           RelEntry::R_X86_64_16, sectionToZakrpiti);
@@ -151,7 +151,7 @@ void SecondPass::startSecondPass() {
                         currSection->setWordInMemoryAt(currOffset, sym->getValOff());
                         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                                           RT::getLastOrdNum()+1,currOffset,
-                                                          RelEntry::R_X86_64_32, sectionToZakrpiti);
+                                                          RelEntry::R_X86_64_16, sectionToZakrpiti);
                         // JEDNOM ILI 2 puta se ovo poziva???????
                         RT::addEntry(relEntry);
                     } else {	//globalan
@@ -163,7 +163,7 @@ void SecondPass::startSecondPass() {
                         currSection->setWordInMemoryAt(currOffset, sym->getValOff());
                         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                                           RT::getLastOrdNum() + 1, currOffset,
-                                                          RelEntry::R_X86_64_32, sectionToZakrpiti);
+                                                          RelEntry::R_X86_64_16, sectionToZakrpiti);
                         // JEDNOM ILI 2 puta se ovo poziva???????
                         // Ovde moze da bude greska, linker ce misliti da se radi o
                         // 32memoriji
@@ -193,7 +193,6 @@ void SecondPass::startSecondPass() {
         case PT::INSTR0: {
             //void instr0(PT::Tok token) {
             string instr = token.getFrontValue();
-            cout << "INSTR " << instr << endl;
             if (instr.compare("halt") == 0) {
                 currSection->setByteInMemoryAt(currOffset, 0);
             } else if (instr.compare("iret") == 0) {
@@ -215,9 +214,10 @@ void SecondPass::startSecondPass() {
                 uint8_t regNum = stoi(token.getFrontValue().substr(1));
                 if (regNum > 255) error("Preveliki broj registra, ! <256", token.numOfLine);
 
-                uint16_t valToWrite = 0x100F;
+                uint8_t valToWrite = 0x0F;
                 valToWrite |= (regNum << 4);
-                currSection->setWordInMemoryAt(currOffset, valToWrite);
+                currSection->setByteInMemoryAt(currOffset, 0x10);
+                currSection->setByteInMemoryAt(currOffset, valToWrite);
                 currOffset += 2;
             } else  if (instr.compare("push") == 0) {
                 string addrType = token.getFrontValue();
@@ -254,7 +254,6 @@ void SecondPass::startSecondPass() {
                 // Ovo ti ne valja u prvom prolazu ! Trebalo bi da sam popravio
                 currOffset += 3;
             } else {
-                cout << "INSTR" << instr << endl;
                 uint8_t byteOpMod;
 
                 if (instr == "call") {
@@ -290,7 +289,7 @@ void SecondPass::startSecondPass() {
 
                     uint8_t byteRdRs = 0xF0;	// Dest: fix , Source : Reg
                     byteRdRs |= regNum;
-                    uint8_t byteUpAddr = 0x01;	// Update: /, Reg ind
+                    uint8_t byteUpAddr = 0x02;	// Update: /, Reg ind
 
                     currSection->setByteInMemoryAt(currOffset, byteOpMod);
                     currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
@@ -326,7 +325,7 @@ void SecondPass::startSecondPass() {
                     currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
 
                     string symbolName = token.getFrontValue();
-                    SecondPass::writeSymbolToMemAndCreatRelEntry(symbolName, token.numOfLine);
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symbolName, token.numOfLine, 0);
                     //											  Word, dodati pomeraj sekcije
 
                     currOffset += 5;
@@ -340,7 +339,7 @@ void SecondPass::startSecondPass() {
                     currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
                     currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
 
-                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine);
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 0);
                     //											  Word, dodati pomeraj sekcije
 
                     currOffset += 5;
@@ -361,13 +360,14 @@ void SecondPass::startSecondPass() {
                     string symName = token.getFrontValue();
 
                     uint8_t byteRdRs = 0xF7;	// Dest: fix , Source : /
-                    uint8_t byteUpAddr = 0x03;	// Update: /, Mem
+                    uint8_t byteUpAddr = 0x03;	// Update: /, PC rel
 
                     currSection->setByteInMemoryAt(currOffset, byteOpMod);
                     currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
                     currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
 
-                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine);
+                    // oduzece 2, jer imamo instrukciju od 5B a on treba da smesti na lokaciju 4-5
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 2);
                     //											  Word, dodati pomeraj sekcije
 
                     currOffset += 5;
@@ -393,7 +393,7 @@ void SecondPass::startSecondPass() {
                     currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
                     currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
 
-                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine);
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 0);
                     //											  Word, dodati pomeraj sekcije
 
                     currOffset += 5;
@@ -404,7 +404,189 @@ void SecondPass::startSecondPass() {
             break;
         }
         case PT::INSTR2: {
-            instr2(token);
+            string instr = token.getFrontValue();
+            if (instr == "ldr"|| instr =="str") {
+                uint8_t regNum1 = stoi(token.getFrontValue().substr(1));
+                if (regNum1 > 8) error("Preveliki broj registra, ! <8", token.numOfLine);
+
+                uint8_t byteOpMod = (instr == "ldr") ? 0xA0 : 0xB0;
+                uint8_t byteRdRs = 0x00;		// Dest: reg1, src:?
+                byteRdRs |= (regNum1 << 4);
+
+                string addrType = token.getFrontValue();
+                if (addrType == "POD_NEPOS_LIT") {
+                    uint16_t addr = stoi(token.getFrontValue());
+
+                    uint8_t byteUpAddr = 0x00;	// Update: /, Neposredno
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+                    currSection->setWordInMemoryAt(currOffset + 3, addr);
+
+                    currOffset += 5;
+                } else if (addrType == "POD_NEPOS_SIM") {
+                    string symName = token.getFrontValue();
+
+                    uint8_t byteUpAddr = 0x00;	// Update: /, Neposredno
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 0);
+                    //											  Word, dodati pomeraj sekcije
+
+                    currOffset += 5;
+                } else if (addrType == "SIM") {
+                    string symName = token.getFrontValue();
+
+                    uint8_t byteUpAddr = 0x04;	// Update: /, Mem
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 0);
+                    //											  Word, dodati pomeraj sekcije
+
+                    currOffset += 5;
+                } else if (addrType == "LIT") {
+                    uint16_t addr = stoi(token.getFrontValue());
+
+                    uint8_t byteUpAddr = 0x04;	// Update: /, Mem
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+                    currSection->setWordInMemoryAt(currOffset + 3, addr); //word
+
+
+                    currOffset += 5;
+                } else if (addrType == "PODiADR_PC_REL_SIM") {
+                    string symName = token.getFrontValue();
+
+                    byteRdRs |= 7;				// Dest: reg , Source : PC
+                    // Mislim da je ovaj red gore totalno totalno nebitan
+                    // Ipak je bitno jer 0x03 nije PC rel vec reg ind a ti namesti
+                    // da taj reg bude PC
+                    uint8_t byteUpAddr = 0x03;	// Update: /, PC rel
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 0);
+                    //											  Word, dodati pomeraj sekcije
+
+                    currOffset += 5;
+                } else if (addrType == "POD_REG_DIR") {
+                    uint8_t regNum2 = stoi(token.getFrontValue().substr(1));
+                    if (regNum2 > 8) error("Preveliki broj registra, ! <8", token.numOfLine);
+
+                    byteRdRs |= regNum2;
+                    uint8_t byteUpAddr = 0x01;	// Update: /, Reg dir
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+
+                    currOffset += 3;
+                } else if (addrType == "POD_REG_IND_BEZ_POM") {
+                    uint8_t regNum2 = stoi(token.getFrontValue().substr(1));
+                    if (regNum2 > 8) error("Preveliki broj registra, ! <8", token.numOfLine);
+
+                    byteRdRs |= regNum2;
+                    uint8_t byteUpAddr = 0x02;	// Update: /, Reg ind
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+
+                    currOffset += 3;
+                } else if (addrType == "POD_REG_DIR_PLUS_LIT") {
+                    uint8_t regNum2 = stoi(token.getFrontValue().substr(1));
+                    if (regNum2 > 8) error("Preveliki broj registra, ! <8", token.numOfLine);
+
+                    byteRdRs |= regNum2;
+                    uint8_t byteUpAddr = 0x03;	// Update: /, Reg ind s pomerajem
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+                    currSection->setWordInMemoryAt(currOffset + 3, stoi(token.getFrontValue()));
+                    //											x2, Word, vrednost literala
+
+                    currOffset += 5;
+                } else if (addrType == "POD_REG_DIR_PLUS_SIM") {
+                    uint8_t regNum2 = stoi(token.getFrontValue().substr(1));
+                    if (regNum2 > 8) error("Preveliki broj registra, ! <8", token.numOfLine);
+
+                    byteRdRs |= regNum2;
+                    uint8_t byteUpAddr = 0x03;	// Update: /, Reg ind s pomerajem
+
+                    currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                    currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+                    currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
+
+                    string symbolName = token.getFrontValue();
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symbolName, token.numOfLine, 0);
+                    //											  Word, dodati pomeraj sekcije
+
+                    currOffset += 5;
+                } else
+                    error("Ovaj vid adresiranja za skok nije dozvoljen", token.numOfLine);
+
+
+            } else {
+                uint8_t regNum1 = stoi(token.getFrontValue().substr(1));
+                string addrType = token.getFrontValue();
+                if (addrType.compare("POD_REG_DIR") != 0)
+                    error("Uz ovu insrukciju ide samo reg dir", token.numOfLine);
+                uint8_t regNum2 = stoi(token.getFrontValue().substr(1));
+
+                if (regNum1 > 8) error("Preveliki broj registra, ! <8", token.numOfLine);
+                if (regNum2 > 8) error("Preveliki broj registra, ! <8", token.numOfLine);
+
+                uint8_t byteOpMod = 0x00;	// Mesto za kod instr
+                uint8_t byteRdRs = 0x00;	// Dest: Reg1 , Source : reg2
+                byteRdRs |= (regNum1 << 4);
+                byteRdRs |= (regNum2);
+
+                if (instr == "xchg") {
+                    uint8_t byteOpMod = 0x60;
+                } else if (instr == "add") {
+                    uint8_t byteOpMod = 0x70;
+                } else if (instr == "sub") {
+                    uint8_t byteOpMod = 0x71;
+                } else if (instr == "mul") {
+                    uint8_t byteOpMod = 0x72;
+                } else if (instr == "div") {
+                    uint8_t byteOpMod = 0x73;
+                } else if (instr == "cmp") {
+                    uint8_t byteOpMod = 0x74;
+                } else if (instr == "not") {
+                    uint8_t byteOpMod = 0x80;
+                } else if (instr == "and") {
+                    uint8_t byteOpMod = 0x81;
+                } else if (instr == "or") {
+                    uint8_t byteOpMod = 0x82;
+                } else if (instr == "xor") {
+                    uint8_t byteOpMod = 0x83;
+                } else if (instr == "test") {
+                    uint8_t byteOpMod = 0x84;
+                } else if (instr == "shl") {
+                    uint8_t byteOpMod = 0x90;
+                } else if (instr == "shr") {
+                    uint8_t byteOpMod = 0x91;
+                }
+
+                currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+
+                currOffset += 2;
+            }
+
             break;
         }
         default:

@@ -36,7 +36,42 @@ call *26231
 call %prekid
 call prekid
 call 322
-			 		 
+
+operanda2:
+
+xchg r7, r3
+shl r3, r5
+
+ldrrr:
+ldr r6, ldrrr
+
+not r3, r6
+#not r3, prekid
+			 		
+test r0, r0					
+
+str r7, $prekid
+str r7, $3223
+str r7, prekid
+str r7, 222
+str r7, %prekid
+#str r7, r9
+str r7, [r6]
+str r7, [r6+31]
+str r7, [r6+ prekid]
+
+
+#str r7, 222 12
+#str r7, 222 as
+#str r7, %prekid as
+
+#str r7, [r6]3
+#str r7, [r6]s3
+#str r7, [r6]+3
+#str r7, [r6+ 1prekid]
+#str r7, [r6 sa]
+#str r7, *[r4]
+
 
 .word g, 4386 	#4
 .word 4660, j1 	#4
