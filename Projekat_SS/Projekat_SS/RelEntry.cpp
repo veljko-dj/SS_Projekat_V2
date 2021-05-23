@@ -22,7 +22,7 @@ string RelEntry::toString() {
     abc += this->secName;
     abc += " loc_offset: ";
     abc += to_string(this->locOffset);
-    abc += " Sym to ref in SymTable: ";
+    abc += " SymToRefInSymTable: ";
     abc += to_string(this->symbolOrdNum);
     abc += " type: ";
     if (this->type == RelEntry::R_X86_64_PC32) abc += "REL";

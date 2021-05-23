@@ -52,9 +52,9 @@ class FirstPass {
         regex noOper{
             "[ \t]*\\w+[ \t]*$" };
         regex oneOper{
-            "[ \t]*\\w+[ \t]+([\\w\\*\\.\\+\\[\\]\\%\\$])+[ \t]*$" };  // Prekopiraj ovo dole za twoOper
+            "[ \t]*\\w+[ \t]+([\\w\\*\\.\\+\\[\\]\\%\\$ ])+[ \t]*$" };  // Prekopiraj ovo dole za twoOper
         regex twoOper{
-            "[ \t]*\\w+[ \t]+(r[0-9])[ \t]*,[ \t]*([\\w\\*\\.\\+\\[\\]\\%\\$])+[ \t]*$" };
+            "[ \t]*\\w+[ \t]+(r[0-9])[ \t]*,[ \t]*([\\w\\*\\.\\+\\[\\]\\%\\$ ])+[ \t]*$" };
         ////////////////////////////////////////////////////
         // Regeksi vezani za operande i tako to
         // Moras da proveris prvo slovo da li je $%[ ili sta vec

@@ -8,7 +8,7 @@ class Symbol;
 class Section;
 class RelEntry {
 public:
-    enum Type {R_X86_64_PC32, R_X86_64_2, R_X86_64_16}; //  Ovo poslednje sam dodao za .word
+    enum Type {R_X86_64_PC32, R_X86_64_32, R_X86_64_16}; //  Ovo poslednje sam dodao za .word
 
 private:
     // Ovo je da vidim za koju sekciju je vezan ovaj relZapis

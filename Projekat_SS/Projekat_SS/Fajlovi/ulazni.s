@@ -28,7 +28,14 @@ int r9			#2
 
 poz_potp:
 call *r3    	#3
-	
+call *[r4]		#3
+call *[r4 + 3]   #5
+call *[r4 + prekid]   #5
+call *prekid
+call *26231
+call %prekid
+call prekid
+call 322
 			 		 
 
 .word g, 4386 	#4

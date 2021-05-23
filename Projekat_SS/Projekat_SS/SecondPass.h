@@ -18,7 +18,7 @@ class SecondPass {
 //    static void instr0( int token);
 //    static void instr1( int token);
 //    static void instr2( int token);
-
+    static void writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOfLinee);
 
 public:
     static void startSecondPass();
