@@ -26,6 +26,10 @@ int main(int argc, char *argv[]) {
     ParsedTokens::printParsedTokens();
     //Ovo mora ovde jer posle ispraznis listu
 
+    // cout
+    SymbolTable::printSymbolTable(cout);
+    // SectionTable::printSections(cout);
+    // RelTable::printRelTable(cout);
 
     SecondPass::startSecondPass();
 

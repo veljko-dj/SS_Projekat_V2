@@ -23,7 +23,7 @@ class FirstPass {
         regex identfierOrNumber{
             "\\w+" };
         regex number{							// broj
-            "\\d+" };
+            "((\\d+)|(0x(\\d|[a-f]|[A-F])+))" };
         regex everything{
             ".*"};
         regex literal{
@@ -52,7 +52,7 @@ class FirstPass {
         regex skip{
             "[ \t]*\\.skip[ \t]+\\d+[ \t]*$" };
         regex equ{
-            "[ \t]*\\.equ[ \t]+\\w+[ \t]*,[ \t]*\\d+[ \t]*$" };
+            "[ \t]*\\.equ[ \t]+\\w+[ \t]*,[ \t]*((\\d+)|(0x(\\d|[a-f]|[A-F])+))[ \t]*$" };
         regex end{
             "[ \t]*\\.end[ \t]*$" };
         regex noOper{
