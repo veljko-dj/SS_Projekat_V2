@@ -26,6 +26,12 @@ class FirstPass {
             "\\d+" };
         regex everything{
             ".*"};
+        regex literal{
+            "^[ \t]*((\\d+)|(0x\\d+)|(\\d_\\d+)|(\\d+\\.\\d+)"	// Sta sve spada u literale je nadjeno na
+            "|(TRUE|FALSE)|('[a-zA-Z]'))[ \t]*$" };				// keil.com literals
+        // PROVERI OVAJ $ NA KRAJU ! ! ! NE ZABORAVI DA POSTOJI
+        regex simbol{						// rec, naziv ili sta god
+            "^[ \t]*[a-zA-Z]\\w*[ \t]*$" };
 
         ////////////////////////////////////////////
         // Regeksi za direktive
@@ -60,12 +66,6 @@ class FirstPass {
         // Moras da proveris prvo slovo da li je $%[ ili sta vec
         regex regDir{
             "^[ \t]*(r[0-9]|sp|pc|psw)[ \t]*$"}; //regX, to je valjda i regD i regS
-        regex literal{
-            "^[ \t]*((\\d+)|(0x\\d+)|(\\d_\\d+)|(\\d+\\.\\d+)"	// Sta sve spada u literale je nadjeno na
-            "|(TRUE|FALSE)|('[a-zA-Z]'))[ \t]*$"};				// keil.com literals
-        // PROVERI OVAJ $ NA KRAJU ! ! ! NE ZABORAVI DA POSTOJI
-        regex simbol{						// rec, naziv ili sta god
-            "^[ \t]*[a-zA-Z]\\w*[ \t]*$" };
 
     };
     static regexi mojRegex;

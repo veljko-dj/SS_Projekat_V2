@@ -21,7 +21,7 @@ class Symbol {
 
 public:
     Symbol(int o_n, string n, int v_o, int s, char t, bool l, string sec);
-    string toString();
+    void toString(std::ostream& out);
 
 
     //Za sada mi nisu potrebni svi ovi getteri i setteri ali jebes ga

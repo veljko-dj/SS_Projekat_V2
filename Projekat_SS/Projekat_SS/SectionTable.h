@@ -13,9 +13,9 @@ class SectionTable {
 public:
     static void addSection(Section* symbolPtr);
     static Section* getLastSection();
-    static void  printSectionTable();
     static int getLastOrdNum();
     static Section* findSectionByName(std::string name);
+    static void  printSections(std::ostream& out);
 };
 
 

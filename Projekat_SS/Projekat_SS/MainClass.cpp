@@ -20,7 +20,6 @@ void MainClass::openFiles(string input, string output) {
     if (!outputFile.is_open())
         error("Neuspesno kreiranje izlaznog fajla");
 
-    outputFile << "Evo teksta";
 }
 
 //	Proerava broj argumenata, da li je .s fajl i prosledjuje
@@ -65,11 +64,14 @@ void MainClass::passArgAndOpenFiles(int argc, char *argv[]) {
 }
 
 void MainClass::assemblyDone() {
-    outputFile.close();
+    cout << "Uspesno zavrsio asembliranje" << endl;
 }
 
-void MainClass::firstPassDone_CloseInputFile() {
+void MainClass::closeInputFile() {
     inputFile.close();
+}
+void MainClass::closeOutputFile() {
+    outputFile.close();
 }
 
 string MainClass::getInputLine() {

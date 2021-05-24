@@ -25,7 +25,7 @@ iret					#lc=11; ->sek2.size=11
 .equ sim, 31
 
 .skip 3
-.word 34969
+.word 0xff33
 .word 26231
 	int  r0 
 #	int 	   $sd3  # Ne moze $ sd3 , tj. razmak

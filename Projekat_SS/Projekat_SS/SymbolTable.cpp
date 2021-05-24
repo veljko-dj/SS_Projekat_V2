@@ -3,6 +3,8 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 
 
 using namespace std;
@@ -19,11 +21,6 @@ Symbol* SymbolTable::getLastSymbol() {
     return nullptr;
 }
 
-void SymbolTable::printSymbolTable() {
-    cout << endl << endl << "____ SYMBOL_TABLE____" << endl;
-    for (list<Symbol*>::iterator it = table.begin(); it != table.end(); ++it)
-        cout << (*it)->toString() << endl;
-}
 
 int SymbolTable::getLastOrdNum() {
     if (table.size() == 0) return 0;
@@ -48,4 +45,19 @@ Symbol * SymbolTable::findSymbolByName(string name) {
             break;
         }
     return sym;
+}
+
+
+void SymbolTable::printSymbolTable(std::ostream& out) {
+    out << "Symbol Table :" << endl;
+    out << setw(8) << "ord_num:";
+    out << setw(14) << "name:";
+    out << setw(10) << "val_off:";
+    out << setw(10) << "size:";
+    out << setw(10) << "local:";
+    out << setw(14) << "section:";
+    out << endl;
+    for (list<Symbol*>::iterator it = table.begin(); it != table.end(); ++it)
+        (*it)->toString(out);
+    out << endl << endl;
 }

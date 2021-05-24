@@ -2,8 +2,10 @@
 #include "RelEntry.h"
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <list>
+#include <iomanip>
 
 
 using namespace std;
@@ -26,11 +28,6 @@ RelEntry * RelTable::getLastEntry() {
     return nullptr;
 }
 
-void RelTable::printRelTable() {
-    cout << endl << endl << "____REL_TABLE____" << endl;
-    for (list<RelEntry*>::iterator it = table.begin(); it != table.end(); ++it)
-        cout << (*it)->toString() << endl;
-}
 
 RelEntry * RelTable::findRelEntryByOrdNum(int id) {
     RelEntry* sym = nullptr;
@@ -40,4 +37,27 @@ RelEntry * RelTable::findRelEntryByOrdNum(int id) {
             break;
         }
     return sym;
+}
+
+void RelTable::printRelTable(ostream& out) {
+    out << "Rel Table: " << endl << setfill(' ');
+    out << "\t" << setw(8) << "ord_num:";
+    out << "\t" << setw(8) << "loc_offset:";
+    out << "\t" << setw(7) << "type:";
+    out << "\t" << setw(8) << "symOrd" << " (symName):";
+    out << endl;
+    for (list<RelEntry*>::iterator it = table.begin(); it != table.end(); ++it)
+        (*it)->toString(out);
+}
+
+void RelTable::printRelTableForSection(ostream& out, string nameOfSection) {
+    out << "Rel Table: " << nameOfSection << endl << setfill(' ');
+    out << "\t" << setw(8) << "ord_num:";
+    out << "\t" << setw(8) << "loc_offset:";
+    out << "\t" << setw(7) << "type:";
+    out << "\t" << setw(8) << "symOrd" << " (symName):";
+    out << endl;
+    for (list<RelEntry*>::iterator it = table.begin(); it != table.end(); ++it)
+        if ((*it)->secName == nameOfSection)
+            (*it)->toString(out);
 }

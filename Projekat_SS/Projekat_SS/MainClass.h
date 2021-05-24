@@ -21,7 +21,8 @@ private:
 public:
     static void passArgAndOpenFiles(int argc, char *argv[]);
     static void assemblyDone();
-    static void firstPassDone_CloseInputFile();
+    static void closeInputFile();
+    static void closeOutputFile();
 
 // pomocne:
     static string getInputLine();

@@ -5,10 +5,11 @@
 
 #include "MainClass.h"
 #include "firstPass.h"
+#include "SecondPass.h"
 #include "parsedTokens.h"
 #include "SymbolTable.h"
-#include "SecondPass.h"
 #include "RelTable.h"
+#include "SectionTable.h"
 
 using namespace std;
 
@@ -18,21 +19,28 @@ int main(int argc, char *argv[]) {
 
 
     MainClass::passArgAndOpenFiles(argc, argv);
+
     FirstPass::startFirstPass();
-    MainClass::firstPassDone_CloseInputFile();
+    MainClass::closeInputFile();
 
     ParsedTokens::printParsedTokens();
-    SymbolTable::printSymbolTable();
+    //Ovo mora ovde jer posle ispraznis listu
+
 
     SecondPass::startSecondPass();
 
-    RelTable::printRelTable();
+    // cout
+    // SymbolTable::printSymbolTable(cout);
+    // SectionTable::printSections(cout);
+    // RelTable::printRelTable(cout);
 
+    // file output
+    SymbolTable::printSymbolTable((ostream&)MainClass::outputFile);
+    SectionTable::printSections((ostream&)MainClass::outputFile);
+    // RelTable::printRelTable((ostream&)MainClass::outputFile);
 
-
-
-    //FirstPass::testRegex();
+    MainClass::closeOutputFile();
+    // FirstPass::testRegex();
 
     MainClass::assemblyDone();
-    cout << endl << endl;
 }

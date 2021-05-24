@@ -12,9 +12,9 @@ public:
     static void addEntry(RelEntry* symbolPtr);
     static int getLastOrdNum();
     static RelEntry* getLastEntry();
-    static void  printRelTable();
     static RelEntry* findRelEntryByOrdNum(int id);
-
+    static void printRelTable(std::ostream& out);
+    static void printRelTableForSection(std::ostream& out,std::string nameOfSection);
 };
 
 

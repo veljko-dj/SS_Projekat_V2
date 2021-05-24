@@ -13,10 +13,10 @@ class SymbolTable {
 public:
     static void addSymbol(Symbol* symbolPtr);
     static Symbol* getLastSymbol();
-    static void  printSymbolTable();
     static int getLastOrdNum();
     static Symbol* getLastSection();
     static Symbol* findSymbolByName(string name);
+    static void  printSymbolTable(std::ostream& out);
 };
 
 

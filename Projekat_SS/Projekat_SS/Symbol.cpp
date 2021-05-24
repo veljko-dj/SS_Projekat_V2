@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <iomanip>
 
 Symbol::Symbol(int o_n, string n, int v_o, int s, char t, bool l, string sec) {
     ord_num = o_n;
@@ -20,26 +21,6 @@ Symbol::Symbol(int o_n, string n, int v_o, int s, char t, bool l, string sec) {
     section = sec;
 }
 
-string Symbol::toString() {
-    string abc = "ord_num: ";
-    abc += to_string(ord_num);
-    //std::cout << "EEE" << ord_num;
-    abc += " name: ";
-    string tmpName = name;	// Da bi sacuvao name bez razmaka
-    tmpName.insert(tmpName.size(), 15 - tmpName.size(), ' ');
-    abc += tmpName;
-    abc += "\t value_offset: ";
-    abc += to_string( value_offset);
-    abc += " size: ";
-    abc += to_string(this->size);
-    abc += " type: ";
-    abc += type;
-    abc += " isLocal: ";
-    abc += to_string(isLocal);
-    abc += " section: ";
-    abc += section;
-    return abc;
-}
 
 int Symbol::getOrdNum() {
     return ord_num;
@@ -97,3 +78,14 @@ void Symbol::setSection(string s) {
     this->section = s;
 }
 
+
+void Symbol::toString(std::ostream& out) {
+    out << setw(8) << to_string(this->ord_num);
+    out << setw(14) << this->name;
+    out << setw(10) << to_string(this->value_offset);
+    out << setw(10) << to_string(this->size);
+    out << setw(10) << ((this->isLocal == 0) ? "G" : "L");
+    out << setw(14) << this->section;
+    out << endl;
+
+}

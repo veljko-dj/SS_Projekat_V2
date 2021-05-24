@@ -1,9 +1,11 @@
 #include "SectionTable.h"
 #include "Section.h"
+#include "RelTable.h"
 
 #include <list>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -19,11 +21,6 @@ Section* SectionTable::getLastSection() {
     return nullptr;
 }
 
-void SectionTable::printSectionTable() {
-    cout << endl << endl << "____ SECTION_TABLE____" << endl;
-    for (list<Section*>::iterator it = table.begin(); it != table.end(); ++it)
-        cout << (*it)->toString() << endl;
-}
 
 int SectionTable::getLastOrdNum() {
     if (table.size() == 0) return 0;
@@ -38,4 +35,16 @@ Section * SectionTable::findSectionByName(string name) {
             break;
         }
     return sym;
+}
+
+
+void SectionTable::printSections(std::ostream& out) {
+    for (list<Section*>::iterator it = table.begin(); it != table.end(); ++it) {
+        out << "_______________________________________________________" << endl;
+        out << (*it)->toString() << endl;
+        (*it)->printBytesASCIIHex(out);
+        //(*it)->printBytesASCIIHexToFileSquare16();	//Squared PRINT
+
+        RelTable::printRelTableForSection(out,(*it)->getName());
+    }
 }
