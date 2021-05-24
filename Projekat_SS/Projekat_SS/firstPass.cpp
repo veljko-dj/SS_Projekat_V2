@@ -256,11 +256,13 @@ bool FirstPass::label(string line) {
         if (currSection=="undefined")
             error("Ne mozes da definies labelu ukoliko se"
                   "ne nalazis u nekoj sekciji.", line);
-        if (ST::findSymbolByName(match[0]) != nullptr) {
-            // Vec postoji u tabeli simbola? Kako zasto?  Za sada je greska !
-            // Da li je neko mogao da kreira ulaz u tabeli? Global ne, to se radi
-            // u drugom prolazu, equ mozda? Nema smisla
-            error("Vec postoji labela u tabeli simbola", line);
+        Symbol* foundSym = ST::findSymbolByName(match[0]);
+        if ( foundSym!= nullptr ) {
+            if (foundSym->getSectionName() != "undefined")
+                error("Vec postoji labela u tabeli simbola", line);
+            // nastavlja dalje ili kraj programa
+            foundSym->setValOff(currOffset);
+            foundSym->setSection(currSection);
         } else {
             //privremena resenja
             int ord_num = ST::getLastOrdNum() + 1;
@@ -311,11 +313,32 @@ bool FirstPass::globalDirective(string line) {
         while (regex_search(line, match, mojRegex.identfier)) {
             for (auto ident : match) {
                 PT::addValueToLastToken(ident);
+
+                {
+                    Symbol* sym = ST::findSymbolByName(ident);
+                    if (sym !=nullptr)	// postavi da je globalan
+                        sym->setIsLocal(false);
+
+                    else {	// ne postoji, dodaj UNDEF simbol
+                        int ord_num = ST::getLastOrdNum() + 1;
+                        string name = ident;
+                        int size = 0;
+                        char type = 'l';
+                        bool isLocal = false;
+                        {
+                            // Dodavanje u tabelu simbola
+                            Symbol* sym = new Symbol(ord_num, name, 0, size, type, isLocal, "undefined");
+                            ST::addSymbol(sym);
+                        }
+                    }
+                }
             }
             line = match.suffix().str();	// bez ovoga vecna petlja
         }
         // Nije potrebno raditi u prvom prolazu, samo dodati token
         // predavanja 108/394
+        // E PA JESTE POTREBNO ! ! !
+
         return true;
     } else
         return false;
@@ -348,7 +371,8 @@ bool FirstPass::externDirective(string line) {
                     {
                         // Dodavanje u tabelu simbola
                         Symbol* sym = new Symbol(ord_num, name, 0/*ne znamo*/,
-                                                 size, type, isLocal, currSection);
+                                                 size, type, isLocal, "extern");
+                        // Proveri da li ce extern praviti problem nekad
                         ST::addSymbol(sym);
                     }
                 }
@@ -456,7 +480,7 @@ bool FirstPass::skipDirective(string line) {
         PT::addNextToken(PT::SKIP, match[0], numOfLine);
         {
             // Samo dodam na trenutni offset taj broj
-            currOffset += stoi(match[0]);
+            currOffset += stoi(match[0], nullptr,0);
         }
         return true;
     } else
@@ -468,9 +492,12 @@ bool FirstPass::equDirective(string line) {
     smatch matchLit;
     if (regex_match(line, mojRegex.equ)) {
 
+        // Ovo afterComma je dobudzeno da bi equ proradio
+        string afterComma = line.substr(line.find_first_of(',') + 1,
+                                        line.length());
         line = line.substr(line.find(".equ") + 4);
         regex_search(line, match, mojRegex.identfier);
-        regex_search(line, matchLit, mojRegex.number);
+        regex_search(afterComma, matchLit, mojRegex.literal);
 
         PT::justCreateTokenWithNoValues(PT::EQU, numOfLine);
         PT::addValueToLastToken(match[0]);
@@ -479,13 +506,14 @@ bool FirstPass::equDirective(string line) {
             // Nisam siguran sta ovde treba raditi,
             // na osnovu teksta zadatka, ubacicu u tabelu simbola,
             // stavicu odgovarajucu sekciju i vrednost i boga pitaj sta dalje
-            if (ST::findSymbolByName(match[0]) == nullptr) {
+            Symbol* foundSym = ST::findSymbolByName(match[0]);
+            if (foundSym == nullptr) {
                 int ord_num = ST::getLastOrdNum() + 1;
                 string name = match[0];
                 int size = 0;			// ne znam
                 char type = 's';		// e kao simbol iz equ
                 bool isLocal = true;
-                int val_off = stoi(matchLit[0]);
+                int val_off = stoi(matchLit[0], nullptr, 0);
                 string section = "absolute";
                 // "absolute" -> Predavanja -> str 12(85/349)
                 // Apsolutnim simbolima ne treba relokacija
@@ -495,9 +523,12 @@ bool FirstPass::equDirective(string line) {
                     ST::addSymbol(sym);
                 }
             } else {
-                // Da li da postavim vrednost?? Hajde pa vidi posle sta ces
-                Symbol* s = ST::findSymbolByName(match[0]);
-                s->setValOff(stoi(matchLit[0]));
+                if (foundSym->getSectionName() != "undefined")
+                    error("Vec postoji labela u tabeli simbola", line);
+                // nastavlja dalje ili kraj programa
+                int val_off = stoi(matchLit[0], nullptr, 0);
+                foundSym->setValOff(val_off);
+                foundSym->setSection("absolute");
             }
         }
         return true;
@@ -538,14 +569,14 @@ bool FirstPass::oneOperInstr(string line) {
                 || (match[0] == "push") || (match[0] == "pop")))
             return false;
         PT::addNextToken(PT::INSTR1, match[0], numOfLine);
-
-        line = line.substr(line.find(match[0]) + match[0].length());
         {
             // Ovo je dodato kasnije, kad sam skontao da push i pop nisu 2 bajta
             // vec su 3 bajta
             if (match[0] == "push" | match[0] == "pop")
                 currOffset += 1; // a posle poveca za jos 2
         }
+        line = line.substr(line.find(match[0]) + match[0].length());
+
         return checkOperand(line);
     } else return false;
 }
@@ -554,7 +585,7 @@ bool FirstPass::twoOperInstr(string line) {
     smatch match;
     if (regex_match(line, mojRegex.twoOper)) {
         regex_search(line, match, mojRegex.identfier);
-        if (!(match[0] == "push" || (match[0] == "pop") || (match[0] == "xchg")
+        if (!(	(match[0] == "xchg")
                 || (match[0] == "add") || (match[0] == "sub") || (match[0] == "mul")
                 || (match[0] == "div") || (match[0] == "cmp") || (match[0] == "not")
                 || (match[0] == "and") || (match[0] == "or") || (match[0] == "xor")

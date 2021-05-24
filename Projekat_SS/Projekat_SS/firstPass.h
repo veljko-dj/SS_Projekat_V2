@@ -23,11 +23,11 @@ class FirstPass {
         regex identfierOrNumber{
             "\\w+" };
         regex number{							// broj
-            "((\\d+)|(0x(\\d|[a-f]|[A-F])+))" };
+            "(\\d+)|(0x(\\d|[a-f]|[A-F])+)" };
         regex everything{
             ".*"};
         regex literal{
-            "^[ \t]*((\\d+)|(0x\\d+)|(\\d_\\d+)|(\\d+\\.\\d+)"	// Sta sve spada u literale je nadjeno na
+            "^[ \t]*((\\d+)|(0x(\\d|[a-f]|[A-F])+)|(\\d_\\d+)|(\\d+\\.\\d+)"	// Sta sve spada u literale je nadjeno na
             "|(TRUE|FALSE)|('[a-zA-Z]'))[ \t]*$" };				// keil.com literals
         // PROVERI OVAJ $ NA KRAJU ! ! ! NE ZABORAVI DA POSTOJI
         regex simbol{						// rec, naziv ili sta god

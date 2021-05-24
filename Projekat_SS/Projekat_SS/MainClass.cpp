@@ -64,7 +64,7 @@ void MainClass::passArgAndOpenFiles(int argc, char *argv[]) {
 }
 
 void MainClass::assemblyDone() {
-    cout << "Uspesno zavrsio asembliranje" << endl;
+    cout << endl <<  "Uspesno zavrsio asembliranje" << endl;
 }
 
 void MainClass::closeInputFile() {

@@ -29,7 +29,7 @@ int SecondPass::currOffset = 0;
 bool SecondPass::end = false;
 
 void SecondPass::error(string msg, int numOfLine) {
-    cout << "\t ERROR: SP: " << msg << endl
+    cout << "\n\t ERROR: SP: " << msg << endl
          << "\t Na liniji: " << numOfLine << endl;
     exit(0);
 }
@@ -50,21 +50,15 @@ void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOf
         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                           RT::getLastOrdNum() + 1, currOffset,
                                           RelEntry::R_16, sectionToZakrpiti, sym->getSectionName());
-        // JEDNOM ILI 2 puta se ovo poziva???????
         RT::addEntry(relEntry);
     } else {	//globalan
-        // Za sada cu isto odraditi, tehnicki mozes i da upises nulu pa
-        // relokacioni zapis koji ce referisati na tu adresu da se zakrpi
-        // novom adresom tog globalnog
-        int sectionToZakrpiti = ST::findSymbolByName(sym->getSectionName())->getOrdNum();
+        // Na vezbama rece da upisujem nulu i onda pravim rel zapis vezan
+        // za sam taj globalan simbol
 
-        currSection->setWordInMemoryAt(currOffset, sym->getValOff() - minusValueForPcRel);
+        currSection->setWordInMemoryAt(currOffset, 0 - minusValueForPcRel);
         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                           RT::getLastOrdNum() + 1, currOffset,
-                                          RelEntry::R_16, sectionToZakrpiti,sym->getSectionName());
-        // JEDNOM ILI 2 puta se ovo poziva???????
-        // Ovde moze da bude greska, linker ce misliti da se radi o
-        // 32memoriji
+                                          RelEntry::R_16, sym->getOrdNum(),sym->getName());
         RT::addEntry(relEntry);
     }
 }
@@ -90,8 +84,9 @@ void SecondPass::startSecondPass() {
                                               token.numOfLine);
                 if (sym->getType() == 'S') error("Ne mozes sekciju proglasiti globalnom",
                                                      token.numOfLine);
-                if (sym->getIsLocal() == false) error("Vec si negde ovaj simbol proglasio globalnim",
-                                                          token.numOfLine);
+                if (sym->getSectionName() == "undefined")
+                    error("Simbol koji proglasavas globalnim nije definisan", token.numOfLine);
+                //if (sym->getIsLocal() == false) cout << "Vec si negde ovaj simbol proglasio globalnim";
                 sym->setIsLocal(false);
             }
             break;
@@ -142,21 +137,15 @@ void SecondPass::startSecondPass() {
                         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                                           RT::getLastOrdNum()+1,currOffset,
                                                           RelEntry::R_16, sectionToZakrpiti, sym->getSectionName());
-                        // JEDNOM ILI 2 puta se ovo poziva???????
                         RT::addEntry(relEntry);
                     } else {	//globalan
-                        // Za sada cu isto odraditi, tehnicki mozes i da upises nulu pa
-                        // relokacioni zapis koji ce referisati na tu adresu da se zakrpi
-                        // novom adresom tog globalnog
-                        int sectionToZakrpiti = ST::findSymbolByName(sym->getSectionName())->getOrdNum();
+                        // Na vezbama rece da upisujem nulu i onda pravim rel zapis vezan
+                        // za sam taj globalan simbol
 
-                        currSection->setWordInMemoryAt_l_endian(currOffset, sym->getValOff());
+                        currSection->setWordInMemoryAt(currOffset, 0);
                         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                                           RT::getLastOrdNum() + 1, currOffset,
-                                                          RelEntry::R_16, sectionToZakrpiti, sym->getSectionName());
-                        // JEDNOM ILI 2 puta se ovo poziva???????
-                        // Ovde moze da bude greska, linker ce misliti da se radi o
-                        // 32memoriji
+                                                          RelEntry::R_16, sym->getOrdNum(), sym->getName());
                         RT::addEntry(relEntry);
                     }
                 }

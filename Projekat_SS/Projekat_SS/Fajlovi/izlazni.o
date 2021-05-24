@@ -1,0 +1,29 @@
+Symbol Table :
+ord_num:         name:  val_off:     size:    local:      section:
+       0     undefined         0         0         L     undefined
+       1        blaBla         0        23         L        blaBla
+       2            x1     13553         0         L      absolute
+       3            g1        16         0         G        blaBla
+       4            g3        16         0         G        blaBla
+       5           g_4        16         0         G        blaBla
+       6             e         0         0         G        extern
+
+
+_______________________________________________________
+SectionName: blaBla         	 size: 23
+Data: 
+		0: 00 00 00 00 00 00 00 00 00 00 
+		10: 00 00 
+		12: 00 00 
+		14: 00 00 
+		16: 00 00 
+		18: 00 
+		19: 10 0f 
+		21: 70 46 
+		23: 
+Rel Table: blaBla
+	ord_num:	loc_offset:	  type:	  symOrd (symName):
+	       1	      10	    D16	       3 (g1)	
+	       2	      12	    D16	       6 (e)	
+	       3	      14	    D16	       6 (e)	
+	       4	      16	    D16	       3 (g1)	
