@@ -3,18 +3,18 @@
 .bss
 lab0:  #komentar
 .section sek2 
-.word i 		#2			 
+.word i, k1		#2			 
 	  
 lab1: 		 
 .skip 3			#3			 
  				 
 		 
-							
+	k1:						
 h1:
 j1:
 .word 0x5678	#2 			
 							
-g:	
+g_:	
 i:						#7			
 			
 .section instr	
@@ -22,7 +22,7 @@ hallt:	halt 	#1					#00
 iret			#1					#20
 ret				#1					#40
 
-.global g
+.global g_
 
 prekid:					#3
 int r9			#2					#10 9F 
@@ -74,7 +74,7 @@ str r7, [r6+ prekid]#5				#BO 76 03 00 03
 #str r7, *[r4]
 
 
-.word g, 4386 	#4					#00 07 22 11 little endian
+.word g_, 4386 	#4					#00 07 22 11 little endian
 .word 4660, j1 	#4					#34 12 05 00 little endian
 
 .equ sim, 31
