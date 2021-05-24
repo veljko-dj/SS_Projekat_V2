@@ -17,6 +17,7 @@ public:
         list<string> values;
         int numOfLine;
         string getFrontValue();
+        bool checkLast();
     };
     // Kod instrukcija je za sada plan da tip bude INSTR, a da values budu tokeni
     // koliko ima parametara proveravamo kao values.size()==1 2 3 itd.
@@ -33,6 +34,7 @@ public:
     static void printParsedTokens();
     static Tok getNextToken();
     static int isEmpty();
+    static void checkLastValues();
 
 };
 

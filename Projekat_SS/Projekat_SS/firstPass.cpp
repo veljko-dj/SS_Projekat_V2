@@ -427,10 +427,13 @@ bool FirstPass::wordDirective(string line) {
         // pokupljen kod sa cplusplus.com regex_search
         while (regex_search(line, match, mojRegex.identfierOrNumber)) {
             for (auto ident : match) {
-                if (regex_match( (string)ident, mojRegex.literal))
+                if (ident == "")
+                    break;
+                if (regex_match((string)ident, mojRegex.literal))
                     PT::addValueToLastToken("NUM");
-                else
+                else if (regex_match((string)ident, mojRegex.identfier))
                     PT::addValueToLastToken("SYM");
+                else cout << "jos jedno cudno desavanje" << endl;
                 PT::addValueToLastToken(ident);
                 {
                     // Za sada samo odvajamo odredjeni prostor za svaki identifikator
@@ -598,7 +601,7 @@ void FirstPass::startFirstPass() {
     // Pa po Sasinom predavanju jeste, da bi ostala ta nula viska
     {
         int ord_num = 0;
-        string name = "undefined";
+        string name = "";
         int size = 0;
         char type = 'S';
         bool isLocal = true;

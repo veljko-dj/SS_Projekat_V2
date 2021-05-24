@@ -25,6 +25,8 @@ int main(int argc, char *argv[]) {
     FirstPass::startFirstPass();
     MainClass::closeInputFile();
 
+    // Ovo moras da imas jer ti regex ubaci razmak viska
+    ParsedTokens::checkLastValues();
     //Ovo mora ovde jer posle ispraznis listu
     ParsedTokens::printParsedTokens();
 

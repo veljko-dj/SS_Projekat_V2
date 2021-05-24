@@ -62,9 +62,24 @@ int ParsedTokens::isEmpty() {
     return tokenList.empty();
 }
 
+void ParsedTokens::checkLastValues() {
+    for (list<Tok>::iterator it = tokenList.begin(); it != tokenList.end(); ++it) {
+        (*it).checkLast();
+    }
+}
+
 string ParsedTokens::Tok::getFrontValue() {
     if (this->values.empty()) return nullptr;
     string tmp = this->values.front();
     this->values.pop_front();
     return tmp;
+}
+
+// Ova metoda je nastala zbog loseg regexa, ubacuje ti u parsirane tokene vrednost ""
+bool ParsedTokens::Tok::checkLast() {
+    string aaaa = this->values.front();
+    if (this->values.front() == "") {
+        this->values.pop_front();
+    }
+    return true;
 }

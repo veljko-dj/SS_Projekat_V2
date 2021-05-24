@@ -2,17 +2,17 @@
 .extern e	 
 .bss
 lab0:  #komentar
-.section sek2 
+.section sek2_2 
 .word i 		#2			 
 	  
 lab1: 		 
-.skip 3			#3			 
+.skip 2			#3			 
  				 
 		 
 							
 h1:
 j1:
-.word 0x5678	#2 			
+.word g,h1#2 			
 							
 g:	
 i:						#7			
