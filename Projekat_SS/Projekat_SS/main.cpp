@@ -17,15 +17,22 @@ int main(int argc, char *argv[]) {
     cout << "Program pokrenut" << endl;
     MainClass mc = MainClass();	// Ovo obrisi, mislim da ne treba
 
+    int _k=0;
+    _k++;
 
     MainClass::passArgAndOpenFiles(argc, argv);
 
     FirstPass::startFirstPass();
     MainClass::closeInputFile();
 
-    ParsedTokens::printParsedTokens();
     //Ovo mora ovde jer posle ispraznis listu
+    ParsedTokens::printParsedTokens();
 
+
+    // cout
+    SymbolTable::printSymbolTable(cout);
+    // SectionTable::printSections(cout);
+    // RelTable::printRelTable(cout);
 
     SecondPass::startSecondPass();
 

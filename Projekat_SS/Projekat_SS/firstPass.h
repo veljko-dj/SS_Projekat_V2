@@ -15,32 +15,32 @@ class FirstPass {
         regex emptyLine{						//samo labela u redu
             "^[ \t]*$" };
         regex labelLineOnly{					//samo labela u redu
-            "^[ \t]*\\w+[ \t]*\\:[ \t]*$" };
+            "^[ \t]*(\\w|_)+[ \t]*\\:[ \t]*$" };
         regex labelLineWithCommand{				// labela pa bilo sta
-            "^[ \t]*\\w+[ \t]*\\:[ \t]*.*" };
+            "^[ \t]*(\\w|_)+[ \t]*\\:[ \t]*.*" };
         regex identfier{						// rec, naziv ili sta god
-            "[a-zA-Z]\\w*"};
+            "[a-zA-Z](\\w|_)*"};
         regex identfierOrNumber{
-            "\\w+" };
+            "(\\w|_)+" };
         regex number{							// broj
             "\\d+" };
         regex everything{
             ".*"};
         regex literal{
-            "^[ \t]*((\\d+)|(0x\\d+)|(\\d_\\d+)|(\\d+\\.\\d+)"	// Sta sve spada u literale je nadjeno na
+            "^[ \t]*((\\d+)|((\\d+)|(0x(\\d|[a-f]|[A-F])+))|(\\d_\\d+)|(\\d+\\.\\d+)"	// Sta sve spada u literale je nadjeno na
             "|(TRUE|FALSE)|('[a-zA-Z]'))[ \t]*$" };				// keil.com literals
         // PROVERI OVAJ $ NA KRAJU ! ! ! NE ZABORAVI DA POSTOJI
         regex simbol{						// rec, naziv ili sta god
-            "^[ \t]*[a-zA-Z]\\w*[ \t]*$" };
+            "^[ \t]*[a-zA-Z](\\w|_)*[ \t]*$" };
 
         ////////////////////////////////////////////
         // Regeksi za direktive
         regex global{
-            "[ \t]*\\.global[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$"};	// Ovde imas \\. umesto \.
+            "[ \t]*\\.global[ \t]+(\\w|_)+([ \t]*,[ \t]*(\\w|_)+)*[ \t]*$"};	// Ovde imas \\. umesto \.
         regex exterN{
-            "[ \t]*\\.extern[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$" };	// kao i \\w umesto \w
+            "[ \t]*\\.extern[ \t]+(\\w|_)+([ \t]*,[ \t]*(\\w|_)+)*[ \t]*$" };	// kao i \\w umesto \w
         regex section{
-            "[ \t]*\\.section[ \t]+\\w+[ \t]*$" };
+            "[ \t]*\\.section[ \t]+(\\w|_)+[ \t]*$" };
         regex dataSection{
             "[ \t]*\\.data[ \t]*$" };
         regex textSection{
@@ -48,19 +48,19 @@ class FirstPass {
         regex bssSection{
             "[ \t]*\\.bss[ \t]*$" };
         regex word{
-            "[ \t]*\\.word[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$" };	// kao i \\w umesto \w
+            "[ \t]*\\.word[ \t]+(\\w|_)+([ \t]*,[ \t]*(\\w|_)+)*[ \t]*$" };	// kao i \\w umesto \w
         regex skip{
             "[ \t]*\\.skip[ \t]+\\d+[ \t]*$" };
         regex equ{
-            "[ \t]*\\.equ[ \t]+\\w+[ \t]*,[ \t]*\\d+[ \t]*$" };
+            "[ \t]*\\.equ[ \t]+(\\w|_)+[ \t]*,[ \t]*((\\d+)|(0x(\\d|[a-f]|[A-F])+))[ \t]*$" };
         regex end{
             "[ \t]*\\.end[ \t]*$" };
         regex noOper{
             "[ \t]*\\w+[ \t]*$" };
         regex oneOper{
-            "[ \t]*\\w+[ \t]+([\\w\\*\\.\\+\\[\\]\\%\\$ ])+[ \t]*$" };  // Prekopiraj ovo dole za twoOper
+            "[ \t]*\\w+[ \t]+([(\\w|_)\\*\\.\\+\\[\\]\\%\\$ ])+[ \t]*$" };  // Prekopiraj ovo dole za twoOper
         regex twoOper{
-            "[ \t]*\\w+[ \t]+(r[0-9])[ \t]*,[ \t]*([\\w\\*\\.\\+\\[\\]\\%\\$ ])+[ \t]*$" };
+            "[ \t]*\\w+[ \t]+(r[0-9])[ \t]*,[ \t]*([(\\w|_)\\*\\.\\+\\[\\]\\%\\$ ])+[ \t]*$" };
         ////////////////////////////////////////////////////
         // Regeksi vezani za operande i tako to
         // Moras da proveris prvo slovo da li je $%[ ili sta vec

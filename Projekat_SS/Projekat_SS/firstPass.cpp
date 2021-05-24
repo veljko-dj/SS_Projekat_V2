@@ -311,8 +311,8 @@ bool FirstPass::globalDirective(string line) {
         while (regex_search(line, match, mojRegex.identfier)) {
             for (auto ident : match) {
                 PT::addValueToLastToken(ident);
+                line = match.suffix().str();	// bez ovoga vecna petlja
             }
-            line = match.suffix().str();	// bez ovoga vecna petlja
         }
         // Nije potrebno raditi u prvom prolazu, samo dodati token
         // predavanja 108/394
