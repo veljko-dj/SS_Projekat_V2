@@ -398,7 +398,8 @@ bool FirstPass::sectionDirective(string line) {
         PT::addNextToken(PT::SECTION, match[0], numOfLine);
         // Prethodnoj sekciji upisati trenutni offset kao velicinu
         if (currSection != "undefined") ST::findSymbolByName(currSection)->setSize(currOffset);
-        if (ST::findSymbolByName(match[0]) == nullptr) {
+        Symbol* sym = ST::findSymbolByName(match[0]);
+        if (sym == nullptr) {
             int ord_num = ST::getLastOrdNum() + 1;
             string name = match[0];
             int size = 0;			// Za sada je nula jer tek ubacujemo
@@ -411,12 +412,19 @@ bool FirstPass::sectionDirective(string line) {
                 Symbol* sym = new Symbol(ord_num,name, currOffset, size, type, isLocal, currSection);
                 ST::addSymbol(sym);
             }
-        } else {
+        } else
             // Vec postoji u tabeli simbola? Kako zasto?  Za sada je greska !
             // Mozda samo treba da se prebacis u tu sekciju i to je to
-            error("Sekcija vec postoji sekcija u tabeli simbola", line);
+            if (sym->getName() == sym->getSectionName()) {
+                currSection = sym->getName();
+                currOffset = sym->getSize();
+                // i to je to za prvi prolaz
+                //error("nije greska", line);
+                // onda je sekcija i treba nastaviti dalje ovu sekciju
+            } else
+                error("Sekcija vec postoji  u tabeli simbola kao simbol", line);
 
-        }
+
         return true;
     } else
         return false;

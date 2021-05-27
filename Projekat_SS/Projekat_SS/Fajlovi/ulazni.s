@@ -25,8 +25,8 @@ not r4
 halt
 
 int r0
-
-.section blaBla
+ 
+ .section blaBla
 add r4,r6
 
 

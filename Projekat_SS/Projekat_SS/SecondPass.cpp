@@ -104,12 +104,20 @@ void SecondPass::startSecondPass() {
             break;
         }
         case PT::SECTION: {
-            // Ovde ce uci i za BSS sekciju !
-            string nameOfSection = token.getFrontValue();
-            Section* newSec = new Section(nameOfSection);
-            SecT::addSection(newSec);
+            // Potrebno je za prethodnu sekciju zabebeleziti gde smo stali
+            if (currSectionName != "undefined")
+                currSection->setOffsetToContinue(currOffset);
 
-            currOffset = 0;
+            string nameOfSection = token.getFrontValue();
+            Section* newSec = SectionTable::findSectionByName(nameOfSection);
+            if (newSec == nullptr) {
+                newSec = new Section(nameOfSection);
+                SecT::addSection(newSec);
+
+                currOffset = 0;
+            } else {
+                currOffset = newSec->getOffsetToContinue();
+            }
             currSectionName = nameOfSection;
             currSecNum = newSec->getOrdNum();
             currSection = newSec;

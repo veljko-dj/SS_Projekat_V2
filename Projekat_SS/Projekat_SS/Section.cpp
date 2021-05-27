@@ -19,6 +19,7 @@ Section::Section(std::string nameP, std::string rwx  ) {
         exit(0);
     }
 
+    this->offsetToContinue = 0;
     this->name = nameP;
     this->sizeFromSymbolTable = symbolSection->getSize();
     this->ordNumInSymbolTable = symbolSection->getOrdNum();
