@@ -17,6 +17,7 @@ public:
     static Symbol* getLastSection();
     static Symbol* findSymbolByName(string name);
     static void  printSymbolTable(std::ostream& out);
+    static void  printSymbolTableBinary(std::ostream& out);
 };
 
 

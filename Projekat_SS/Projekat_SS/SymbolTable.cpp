@@ -61,3 +61,14 @@ void SymbolTable::printSymbolTable(std::ostream& out) {
         (*it)->toString(out);
     out << endl << endl;
 }
+
+void SymbolTable::printSymbolTableBinary(std::ostream & out) {
+    int numOfSym = table.size();
+    out.write((char*)&numOfSym, sizeof(int));
+    for (list<Symbol*>::iterator it = table.begin(); it != table.end(); ++it) {
+        Symbol s = *(*it);
+        s.toString(cout);
+        out.write((char*)&s, sizeof(Symbol));
+    }
+    out << endl << endl;
+}

@@ -27,7 +27,7 @@
     <ClCompile Include="Symbol.cpp" />
     <ClCompile Include="firstPass.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainClass.cpp" />
+    <ClCompile Include="MainClass_ASM.cpp" />
     <ClCompile Include="parsedTokens.cpp" />
     <ClCompile Include="SymbolTable.cpp" />
   </ItemGroup>
@@ -39,7 +39,7 @@
     <ClInclude Include="SectionTable.h" />
     <ClInclude Include="Symbol.h" />
     <ClInclude Include="firstPass.h" />
-    <ClInclude Include="MainClass.h" />
+    <ClInclude Include="MainClass_ASM.h" />
     <ClInclude Include="parsedTokens.h" />
     <ClInclude Include="SymbolTable.h" />
   </ItemGroup>

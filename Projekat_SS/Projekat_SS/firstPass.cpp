@@ -1,4 +1,4 @@
-#include "MainClass.h"
+#include "MainClass_ASM.h"
 #include "firstPass.h"
 #include "parsedTokens.h"
 #include "Symbol.h"
@@ -13,7 +13,7 @@
 using namespace std;
 
 
-using MC = MainClass;
+using MC = MainClass_ASM;
 using PT = ParsedTokens;
 using ST = SymbolTable;
 
@@ -33,6 +33,7 @@ void FirstPass::error(string msg, string line) {
 bool FirstPass::emptyLine(string line) {
     return regex_match(line, mojRegex.emptyLine) ? true: false;
 }
+
 // Koristi se u oneOperand() i twoOperand()
 bool FirstPass::checkOperand(string line) {
     smatch match;
@@ -260,14 +261,14 @@ bool FirstPass::label(string line) {
         if ( foundSym!= nullptr ) {
             if (foundSym->getSectionName() != "undefined")
                 error("Vec postoji labela u tabeli simbola", line);
-            // nastavlja dalje ili kraj programa
+            // Pronasao si globalan, postavi vrednosti lepo
             foundSym->setValOff(currOffset);
             foundSym->setSection(currSection);
         } else {
-            //privremena resenja
+            // Nepostoji simbol, ubaciti ga
             int ord_num = ST::getLastOrdNum() + 1;
             string name = match[0];
-            int size = 0;			// ne znam, logicno je da je nebitno
+            int size = 0;			// nebitno je za simbol
             char type = 'l';		// simbol
             bool isLocal = true;
             {
@@ -316,14 +317,16 @@ bool FirstPass::globalDirective(string line) {
 
                 {
                     Symbol* sym = ST::findSymbolByName(ident);
-                    if (sym !=nullptr)	// postavi da je globalan
+                    if (sym !=nullptr)
+                        // Postoji i postavi da je globalan
                         sym->setIsLocal(false);
 
-                    else {	// ne postoji, dodaj UNDEF simbol
+                    else {
+                        // ne postoji, dodaj UNDEF simbol
                         int ord_num = ST::getLastOrdNum() + 1;
                         string name = ident;
                         int size = 0;
-                        char type = 'l';
+                        char type = 'g';
                         bool isLocal = false;
                         {
                             // Dodavanje u tabelu simbola
@@ -372,7 +375,7 @@ bool FirstPass::externDirective(string line) {
                         // Dodavanje u tabelu simbola
                         Symbol* sym = new Symbol(ord_num, name, 0/*ne znamo*/,
                                                  size, type, isLocal, "extern");
-                        // Proveri da li ce extern praviti problem nekad
+                        // "extern" naknadno dodato, nadam se da ne pravi problem nigde
                         ST::addSymbol(sym);
                     }
                 }
@@ -393,13 +396,9 @@ bool FirstPass::sectionDirective(string line) {
         line = line.substr(line.find(".section") + 8);
         regex_search(line, match, mojRegex.identfier);
         PT::addNextToken(PT::SECTION, match[0], numOfLine);
-        // potrebno je prethodnoj sekciji upisati duzinu i tako to
-        //currOffset = 333;
+        // Prethodnoj sekciji upisati trenutni offset kao velicinu
         if (currSection != "undefined") ST::findSymbolByName(currSection)->setSize(currOffset);
-        //Symbol*lastSect= ST::getLastSection();
-        //if (lastSect != nullptr) lastSect->setSize(currOffset);
         if (ST::findSymbolByName(match[0]) == nullptr) {
-            //privremeno resenje
             int ord_num = ST::getLastOrdNum() + 1;
             string name = match[0];
             int size = 0;			// Za sada je nula jer tek ubacujemo
@@ -415,7 +414,7 @@ bool FirstPass::sectionDirective(string line) {
         } else {
             // Vec postoji u tabeli simbola? Kako zasto?  Za sada je greska !
             // Mozda samo treba da se prebacis u tu sekciju i to je to
-            error("Vec postoji sekcija u tabeli simbola", line);
+            error("Sekcija vec postoji sekcija u tabeli simbola", line);
 
         }
         return true;
@@ -505,12 +504,12 @@ bool FirstPass::equDirective(string line) {
         {
             // Nisam siguran sta ovde treba raditi,
             // na osnovu teksta zadatka, ubacicu u tabelu simbola,
-            // stavicu odgovarajucu sekciju i vrednost i boga pitaj sta dalje
+            // stavicu apsolutnu sekciju i vrednost i boga pitaj sta dalje
             Symbol* foundSym = ST::findSymbolByName(match[0]);
             if (foundSym == nullptr) {
                 int ord_num = ST::getLastOrdNum() + 1;
                 string name = match[0];
-                int size = 0;			// ne znam
+                int size = 0;			// Nebitno
                 char type = 's';		// e kao simbol iz equ
                 bool isLocal = true;
                 int val_off = stoi(matchLit[0], nullptr, 0);
@@ -524,7 +523,7 @@ bool FirstPass::equDirective(string line) {
                 }
             } else {
                 if (foundSym->getSectionName() != "undefined")
-                    error("Vec postoji labela u tabeli simbola", line);
+                    error("Vec postoji simbol u tabeli simbola", line);
                 // nastavlja dalje ili kraj programa
                 int val_off = stoi(matchLit[0], nullptr, 0);
                 foundSym->setValOff(val_off);
@@ -566,7 +565,7 @@ bool FirstPass::oneOperInstr(string line) {
         regex_search(line, match, mojRegex.identfier);
         if (!(match[0] == "int" || (match[0] == "call") || (match[0] == "jmp")
                 || (match[0] == "jeq") || (match[0] == "jne") || (match[0] == "jgt")
-                || (match[0] == "push") || (match[0] == "pop")))
+                || (match[0] == "push") || (match[0] == "pop") || (match[0]=="not")))
             return false;
         PT::addNextToken(PT::INSTR1, match[0], numOfLine);
         {
@@ -587,7 +586,7 @@ bool FirstPass::twoOperInstr(string line) {
         regex_search(line, match, mojRegex.identfier);
         if (!(	(match[0] == "xchg")
                 || (match[0] == "add") || (match[0] == "sub") || (match[0] == "mul")
-                || (match[0] == "div") || (match[0] == "cmp") || (match[0] == "not")
+                || (match[0] == "div") || (match[0] == "cmp") /*|| (match[0] == "not")*/
                 || (match[0] == "and") || (match[0] == "or") || (match[0] == "xor")
                 || (match[0] == "test") || (match[0] == "shl") || (match[0] == "shr")
                 || (match[0] == "ldr") || (match[0] == "str") ))
@@ -668,6 +667,6 @@ void FirstPass::startFirstPass() {
 
         }
     }
-    cout << endl << "gotov Prvi prolaz";
+    cout << endl << "\tGotov Prvi prolaz";
 }
 

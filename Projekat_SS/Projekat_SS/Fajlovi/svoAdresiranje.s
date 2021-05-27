@@ -46,7 +46,10 @@ shl r3, r5		#2					#90 35
 ldrrr:					#50
 ldr r6, ldrrr	#5					#A0 60 04 00 32 (0x32==50)
 
-not r3, r6		#2					#80 36
+#not r3, r6		#2					#80 36
+
+not r3
+
 #not r3, prekid
 			 		
 test r0, r0		#2					#84 00			
@@ -80,7 +83,7 @@ str r7, [r6+ prekid]#5				#BO 76 03 00 03
 .equ sim, 31
 
 .skip 3			#3					#00 00 00
-.word 34969		#2					#99 88
+.word 0xf3f3	#2					#99 88
 .word 26231		#2					#77 66
 #	int  r0 
 #	int 	   $sd3  # Ne moze $ sd3 , tj. razmak
@@ -102,7 +105,8 @@ str r7, [r6+ prekid]#5				#BO 76 03 00 03
 #	int $0x12 #PROVERI OVO  ! ! ! 
 #	shr r0, *[r0+4.1]
 	
-	
+.section novaSekcija
+.equ asd, 0x3210
 #	halt  				#lc =11; sekc.size=4;
 	
 .end

@@ -1,7 +1,6 @@
 #include "Section.h"
 #include "SymbolTable.h"
 #include "Symbol.h"
-#include "MainClass.h"
 
 #include <string>
 #include <fstream>
@@ -50,6 +49,10 @@ int Section::getSize() {
 
 string Section::getRWX() {
     return this->rwxNotFromSymbolTable;
+}
+
+int Section::getOffsetToContinue() {
+    return this->offsetToContinue;
 }
 
 void Section::setName(std::string n) {
@@ -101,9 +104,14 @@ void Section::setRWX(string s) {
     this->rwxNotFromSymbolTable = s;
 }
 
+void Section::setOffsetToContinue(int s) {
+    this->offsetToContinue = s;
+}
+
 void Section::addNextCR(int cO) {
     nextCR.insert(cO);
 }
+
 
 string Section::toString() {
     string abc = "";

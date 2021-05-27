@@ -66,7 +66,7 @@ void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOf
 
 void SecondPass::startSecondPass() {
     cout << endl<<endl<<
-         "Poceo je drugi prolaz" << endl;
+         "\tPoceo je drugi prolaz" << endl;
 
     while (!PT::isEmpty() && !end) {
         PT::Tok token = PT::getNextToken();
@@ -79,7 +79,7 @@ void SecondPass::startSecondPass() {
             while (!token.values.empty()) {
                 string name = token.getFrontValue();
                 Symbol* sym = ST::findSymbolByName(name);
-                if (sym == nullptr) error("Simbol koji kazemo da je globalan"
+                if (sym == nullptr) error("xkazemo da je globalan"
                                               " nije definisan, ne postoji u tabeli simbola",
                                               token.numOfLine);
                 if (sym->getType() == 'S') error("Ne mozes sekciju proglasiti globalnom",
@@ -189,7 +189,24 @@ void SecondPass::startSecondPass() {
         }
         case PT::INSTR1: {
             string instr = token.getFrontValue();
-            if (instr.compare("int") == 0) {
+            if (instr.compare("not") == 0) {
+                string addrType = token.getFrontValue();
+                uint8_t regNum1 = stoi(token.getFrontValue().substr(1));
+                if (addrType.compare("POD_REG_DIR") != 0)
+                    error("Uz ovu insrukciju ide samo reg dir", token.numOfLine);
+
+                if (regNum1 > 8) error("Preveliki broj registra, ! <8", token.numOfLine);
+
+                uint8_t byteOpMod = 0x80;	// Not
+                uint8_t byteRdRs = 0x00;	// Dest: Reg1 , Source : reg2
+                byteRdRs |= (regNum1 << 4);
+                byteRdRs |= 0xF;	// nebitna vrednost
+
+                currSection->setByteInMemoryAt(currOffset, byteOpMod);
+                currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
+
+                currOffset += 2;
+            } else if (instr.compare("int") == 0) {
                 string addrType = token.getFrontValue();
                 if (addrType.compare("POD_REG_DIR") != 0)
                     error("Uz insrukciju int ide samo reg dir", token.numOfLine);

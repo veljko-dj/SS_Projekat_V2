@@ -42,6 +42,11 @@ public:
     void setIsLocal(bool l);
     void setSection(string s) ;
 
+
+    /////////////////////////
+    // LINKER FAZA
+    Symbol();
+
 };
 // U tabeli simbola na 13 str vidimo da prvi ulaz je neki UNDEFINED
 

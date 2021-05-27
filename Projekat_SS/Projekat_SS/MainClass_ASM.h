@@ -6,12 +6,13 @@
 
 using namespace std;
 
-class MainClass {
+class MainClass_ASM {
 private:
 //param
 public:
-    static std::ifstream inputFile ;
-    static std::ofstream outputFile ;
+    static std::ifstream inputFile;
+    static std::ofstream outputFile;
+    static std::ofstream outputFileTxt;
 
 //methods
 private:
@@ -20,9 +21,9 @@ private:
     static void error(std::string );
 public:
     static void passArgAndOpenFiles(int argc, char *argv[]);
-    static void assemblyDone();
     static void closeInputFile();
     static void closeOutputFile();
+    static void assemblyDoneSayBye();
 
 // pomocne:
     static string getInputLine();

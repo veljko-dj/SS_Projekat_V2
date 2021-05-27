@@ -9,31 +9,37 @@ using namespace std;
 
 class FirstPass {
     struct regexi {
-        // [ \t]* razmak(tab) 0 ili vise puta
-        // \\w* slovo ili broj 0 ili vise puta. Sme da pocne velikim slovom
-        // [A-Za-z]* slova samo
-        regex emptyLine{						//samo labela u redu
+        /*	[ \t]* razmak(tab) 0 ili vise puta
+         *	\\w* slovo ili broj ili _ ,0 ili vise puta.
+         *	[A-Za-z]* slova samo
+         */
+
+        regex emptyLine{						//	Prazna linija
             "^[ \t]*$" };
-        regex labelLineOnly{					//samo labela u redu
+        regex labelLineOnly{					//	Labela u liniji
             "^[ \t]*\\w+[ \t]*\\:[ \t]*$" };
-        regex labelLineWithCommand{				// labela pa bilo sta
+        regex labelLineWithCommand{				//	Labela i komanda u 1 liniji
             "^[ \t]*\\w+[ \t]*\\:[ \t]*.*" };
-        regex identfier{						// rec, naziv ili sta god
+        regex identfier{						//	Identifikator koji pocinje slovom
             "[a-zA-Z]\\w*"};
-        regex identfierOrNumber{
+        regex identfierOrNumber{				//	Bilo sta sem razmaka
             "\\w+" };
-        regex number{							// broj
+        regex simbol{							//  Isto kao ident sa ' '$ i^
+            "^[ \t]*[a-zA-Z]\\w*[ \t]*$" };
+        regex number{							//	Broj dec ili hex
             "(\\d+)|(0x(\\d|[a-f]|[A-F])+)" };
-        regex everything{
+        regex everything{						// Bas bilo sta
             ".*"};
         regex literal{
-            "^[ \t]*((\\d+)|(0x(\\d|[a-f]|[A-F])+)|(\\d_\\d+)|(\\d+\\.\\d+)"	// Sta sve spada u literale je nadjeno na
-            "|(TRUE|FALSE)|('[a-zA-Z]'))[ \t]*$" };				// keil.com literals
-        // PROVERI OVAJ $ NA KRAJU ! ! ! NE ZABORAVI DA POSTOJI
-        regex simbol{						// rec, naziv ili sta god
-            "^[ \t]*[a-zA-Z]\\w*[ \t]*$" };
+            // Sta sve spada u literale je nadjeno na keil.com literals
+            "^[ \t]*((\\d+)|(0x(\\d|[a-f]|[A-F])+)|(\\d_\\d+)"
+            ")[ \t]*$" };			// Ne zaboravi da ovde postoji $
+        /*
+        	Izbaceni delovi radi uproscavanja literala: RADE
+        	|(TRUE|FALSE)	|('[a-zA-Z]')	|(\\d+\\.\\d+)
+        */
 
-        ////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
         // Regeksi za direktive
         regex global{
             "[ \t]*\\.global[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$"};	// Ovde imas \\. umesto \.
@@ -65,7 +71,7 @@ class FirstPass {
         // Regeksi vezani za operande i tako to
         // Moras da proveris prvo slovo da li je $%[ ili sta vec
         regex regDir{
-            "^[ \t]*(r[0-9]|sp|pc|psw)[ \t]*$"}; //regX, to je valjda i regD i regS
+            "^[ \t]*(r[0-9]|sp|pc|psw)[ \t]*$"};			//regX, to je valjda i regD i regS
 
     };
     static regexi mojRegex;

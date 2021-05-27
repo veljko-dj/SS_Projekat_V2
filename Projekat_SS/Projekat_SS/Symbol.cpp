@@ -78,6 +78,9 @@ void Symbol::setSection(string s) {
     this->section = s;
 }
 
+Symbol::Symbol() {
+}
+
 
 void Symbol::toString(std::ostream& out) {
     out << setw(8) << to_string(this->ord_num);

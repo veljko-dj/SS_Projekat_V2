@@ -1,29 +1,35 @@
-#include "MainClass.h"
+#include "MainClass_ASM.h"
+
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <regex>
+
 using namespace std;
 
 
 // Staticke moras da navedes i u cpp fajlu
-ifstream MainClass::inputFile ;
-ofstream MainClass::outputFile ;
+ifstream MainClass_ASM::inputFile;
+ofstream MainClass_ASM::outputFile;
+ofstream MainClass_ASM::outputFileTxt;
 
-// Otvara fajlove inputFiles outputFiles, baca gresku
-void MainClass::openFiles(string input, string output) {
+// Otvara fajlove inputFiles outputFiles
+void MainClass_ASM::openFiles(string input, string output) {
     inputFile.open(input);
-    outputFile.open(output);
+    outputFile.open(output, ios::out | ios::binary);
+    outputFileTxt.open(output.substr(0,output.length()-2).append(".txt"));
 
     if (!inputFile.is_open())
         error("Neuspesno otvaranje ulaznog fajla");
     if (!outputFile.is_open())
         error("Neuspesno kreiranje izlaznog fajla");
+    if (!outputFileTxt.is_open())
+        error("Neuspesno kreiranje izlaznog fajla");
 
 }
 
-//	Proerava broj argumenata, da li je .s fajl i prosledjuje
-void MainClass::checkArg(int argc, char * argv[], string& inputStr, string& outputStr) {
+// Provera broja argumenata, da li je .s fajl
+void MainClass_ASM::checkArg(int argc, char * argv[], string& inputStr, string& outputStr) {
     string opt = "-o";
     int posOfExt;
 
@@ -49,12 +55,12 @@ void MainClass::checkArg(int argc, char * argv[], string& inputStr, string& outp
 }
 
 //	Ispisuje gresku na izlazu za greske i exit(-1);
-void MainClass::error(std::string msg) {
+void MainClass_ASM::error(std::string msg) {
     cerr << msg << endl;
     exit(-1);
 }
 
-void MainClass::passArgAndOpenFiles(int argc, char *argv[]) {
+void MainClass_ASM::passArgAndOpenFiles(int argc, char *argv[]) {
     string input, output;
 
     checkArg(argc, argv, input, output);
@@ -63,26 +69,29 @@ void MainClass::passArgAndOpenFiles(int argc, char *argv[]) {
 
 }
 
-void MainClass::assemblyDone() {
-    cout << endl <<  "Uspesno zavrsio asembliranje" << endl;
-}
-
-void MainClass::closeInputFile() {
+void MainClass_ASM::closeInputFile() {
     inputFile.close();
 }
-void MainClass::closeOutputFile() {
+
+void MainClass_ASM::closeOutputFile() {
     outputFile.close();
+    outputFileTxt.close();
+    if (!outputFile.good())
+        error("Error occurred at writing time!");
+    if (!outputFileTxt.good())
+        error("Error occurred at writing time!");
 }
 
-string MainClass::getInputLine() {
+void MainClass_ASM::assemblyDoneSayBye() {
+    cout << endl << "\tUspesno zavrsio asembliranje" << endl;
+}
+
+string MainClass_ASM::getInputLine() {
     string ret;
     getline(inputFile, ret);
     return ret;
 }
 
-bool MainClass::eofInput() {
-
+bool MainClass_ASM::eofInput() {
     return inputFile.eof();
 }
-
-
