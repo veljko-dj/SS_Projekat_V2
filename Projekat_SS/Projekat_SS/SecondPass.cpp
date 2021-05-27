@@ -34,7 +34,12 @@ void SecondPass::error(string msg, int numOfLine) {
     exit(0);
 }
 
-void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOfLinee, int minusValueForPcRel) {
+void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOfLinee,
+        int minusValueForPcRel,string tipS="ABS") {
+    RelEntry::Type tip;
+    if (tipS == "PC")  tip = RelEntry::R_PC16;
+    else tip = RelEntry::R_16;
+
     Symbol* sym = ST::findSymbolByName(nameOfSymbol);
     if (sym == nullptr) SecondPass::error("Simbol nije definisan", numOfLinee);
     // Da li je definisan, da li je globalan, sta radit? Da li je ABS?
@@ -49,7 +54,7 @@ void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOf
         currSection->setWordInMemoryAt(currOffset, sym->getValOff() - minusValueForPcRel);
         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                           RT::getLastOrdNum() + 1, currOffset,
-                                          RelEntry::R_16, sectionToZakrpiti, sym->getSectionName());
+                                          tip, sectionToZakrpiti, sym->getSectionName());
         RT::addEntry(relEntry);
     } else {	//globalan
         // Na vezbama rece da upisujem nulu i onda pravim rel zapis vezan
@@ -58,7 +63,7 @@ void SecondPass::writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOf
         currSection->setWordInMemoryAt(currOffset, 0 - minusValueForPcRel);
         RelEntry* relEntry = new RelEntry(currSection->getName(),
                                           RT::getLastOrdNum() + 1, currOffset,
-                                          RelEntry::R_16, sym->getOrdNum(),sym->getName());
+                                          tip, sym->getOrdNum(),sym->getName());
         RT::addEntry(relEntry);
     }
 }
@@ -368,10 +373,14 @@ void SecondPass::startSecondPass() {
 
                     currOffset += 5;
                 } else if (addrType == "PODiADR_PC_REL_SIM") {
+                    // Ovde se radi o relativnom PC adresiranju, ako odradimo
+                    // registarski indirektno, to nece bas imati smisla
                     string symName = token.getFrontValue();
 
                     uint8_t byteRdRs = 0xF7;	// Dest: fix , Source : /
                     uint8_t byteUpAddr = 0x03;	// Update: /, PC rel
+                    // uint8_t byteUpAddr = 0x00;	// Update: /, NEPOSREDNO
+
 
                     currSection->setByteInMemoryAt(currOffset, byteOpMod);
                     currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);
@@ -379,8 +388,10 @@ void SecondPass::startSecondPass() {
 
                     currOffset += 3;
                     // oduzece 2, jer imamo instrukciju od 5B a on treba da smesti na lokaciju 4-5
-                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 2);
-                    //											  Word, dodati pomeraj sekcije
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 2, "PC" );
+                    // Da li ovde staviti neposredno pa dva relok zapisa? Jedan za PC a drugi za simbol,
+                    // Jos nisam razjasnio, nije mi bas najjasnije kako radi linker. Posle vezbi odradi
 
                     currOffset += 2;
                 } else if (addrType == "LIT") {
@@ -493,8 +504,9 @@ void SecondPass::startSecondPass() {
                     currSection->setByteInMemoryAt(currOffset + 2, byteUpAddr);
 
                     currOffset += 3;
-                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 0);
-                    //											  Word, dodati pomeraj sekcije
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    SecondPass::writeSymbolToMemAndCreatRelEntry(symName, token.numOfLine, 2, "PC" );
+                    //				 Mislim da ovde ne treba PC jer si PC vec ukljucio u racun preko reg7 ind?
 
                     currOffset += 2;
                 } else if (addrType == "POD_REG_DIR") {

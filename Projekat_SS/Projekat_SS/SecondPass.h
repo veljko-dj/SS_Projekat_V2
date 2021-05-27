@@ -18,7 +18,8 @@ class SecondPass {
 //    static void instr0( int token);
 //    static void instr1( int token);
 //    static void instr2( int token);
-    static void writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOfLinee, int minusValueForPcRel);
+    static void writeSymbolToMemAndCreatRelEntry(string nameOfSymbol, int numOfLinee,
+            int minusValueForPcRel,std::string tip);
 
 public:
     static void startSecondPass();

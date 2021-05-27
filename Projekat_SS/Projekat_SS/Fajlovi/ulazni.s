@@ -28,6 +28,6 @@ int r0
  
  .section blaBla
 add r4,r6
-
+str r1, %g1
 
 .end

@@ -1,7 +1,7 @@
 Symbol Table :
 ord_num:         name:  val_off:     size:    local:      section:
        0     undefined         0         0         L     undefined
-       1        blaBla         0        22         L        blaBla
+       1        blaBla         0        27         L        blaBla
        2            x1     13553         0         L      absolute
        3            g3        14         0         G        blaBla
        4            g1        16         0         G        blaBla
@@ -11,7 +11,7 @@ ord_num:         name:  val_off:     size:    local:      section:
 
 
 _______________________________________________________
-SectionName: blaBla         	 size: 22
+SectionName: blaBla         	 size: 27
 Data: 
 		0: 00 00 00 00 00 00 00 00 00 00 
 		10: 00 00 
@@ -20,13 +20,15 @@ Data:
 		16: 00 00 
 		18: 80 4f 
 		20: 70 46 
-		22: 
+		22: b0 17 03 ff fe 
+		27: 
 Rel Table: blaBla
 	ord_num:	loc_offset:	  type:	  symOrd (symName):
 	       1	      10	    D16	       4 (g1)	
 	       2	      12	    D16	       6 (e)	
 	       3	      14	    D16	       6 (e)	
 	       4	      16	    D16	       4 (g1)	
+	       5	      25	    REL	       4 (g1)	
 _______________________________________________________
 SectionName: novaS          	 size: 3
 Data: 

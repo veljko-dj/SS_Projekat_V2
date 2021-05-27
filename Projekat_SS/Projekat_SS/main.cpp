@@ -19,6 +19,16 @@ const bool ISPIS_TOKENA = false;
 using namespace std;
 
 int main(int argc, char *argv[]) {
+    /*
+    	! ! ! ! ! ! NAPOMENA ! ! ! ! ! !
+    	Pretrazi ceo projekat, trazi "PC", gde god se to pojavi, tu ti je PC relativno,
+    	tj. %simbol i tu ne znam sta treba da radim. Pre predaje nauci kako to treba da radi i samo
+    	skloni "PC" jer ima podraz vrednost, ili ga ostavi ako mislis da treba
+    	ili za skok odradi neposredno ili kako vec
+
+    */
+
+
     cout << "\tProgram pokrenut" << endl;
 
     // FirstPass::testRegex();
