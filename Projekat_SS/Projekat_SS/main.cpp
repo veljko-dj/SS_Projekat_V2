@@ -1,15 +1,14 @@
-#pragma once
 
 #include <iostream>
 #include <string>
 
-#include "MainClass_ASM.h"
-#include "firstPass.h"
-#include "SecondPass.h"
-#include "parsedTokens.h"
-#include "SymbolTable.h"
-#include "RelTable.h"
-#include "SectionTable.h"
+#include "../h/MainClass_ASM.h"
+#include "../h/firstPass.h"
+#include "../h/SecondPass.h"
+#include "../h/parsedTokens.h"
+#include "../h/SymbolTable.h"
+#include "../h/RelTable.h"
+#include "../h/SectionTable.h"
 
 const bool ISPIS_NA_KONZOLU_PRE_DRUGOG_PROLAZA = false;
 const bool ISPIS_NA_KONZOLU_POSLE_DRUGOG_PROLAZA = false;
@@ -26,6 +25,9 @@ int main(int argc, char *argv[]) {
     	skloni "PC" jer ima podraz vrednost, ili ga ostavi ako mislis da treba
     	ili za skok odradi neposredno ili kako vec
 
+    */
+    /*
+        ./asembler_v1  
     */
 
 

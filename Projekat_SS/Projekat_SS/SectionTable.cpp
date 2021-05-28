@@ -1,6 +1,6 @@
-#include "SectionTable.h"
-#include "Section.h"
-#include "RelTable.h"
+#include "../h/SectionTable.h"
+#include "../h/Section.h"
+#include "../h/RelTable.h"
 
 #include <list>
 #include <string>
@@ -40,11 +40,11 @@ Section * SectionTable::findSectionByName(string name) {
 
 void SectionTable::printSections(std::ostream& out) {
     for (list<Section*>::iterator it = table.begin(); it != table.end(); ++it) {
-        out << "_______________________________________________________" << endl;
+        out << "_______________________________________________________" << endl << endl;
         out << (*it)->toString() << endl;
         (*it)->printBytesASCIIHex(out);
         //(*it)->printBytesASCIIHexToFileSquare16();	//Squared PRINT
 
-        RelTable::printRelTableForSection(out,(*it)->getName());
+        RelTable::printRelTableForSection(out,(*it)->getName(), (*it)->getSize());
     }
 }

@@ -1,8 +1,8 @@
-#include "MainClass_ASM.h"
-#include "firstPass.h"
-#include "parsedTokens.h"
-#include "Symbol.h"
-#include "SymbolTable.h"
+#include "../h/MainClass_ASM.h"
+#include "../h/firstPass.h"
+#include "../h/parsedTokens.h"
+#include "../h/Symbol.h"
+#include "../h/SymbolTable.h"
 
 #include <string>
 #include <regex>

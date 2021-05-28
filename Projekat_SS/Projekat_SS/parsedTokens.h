@@ -1,4 +1,7 @@
 #pragma once
+#ifndef PARSED_TOKENS_H
+#define PARSED_TOKENS_H
+
 #include <string>
 #include <list>
 using namespace std;
@@ -36,3 +39,5 @@ public:
 
 };
 
+
+#endif

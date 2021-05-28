@@ -1,9 +1,11 @@
-#include "RelEntry.h"
-#include "SymbolTable.h"
+#include "../h/RelEntry.h"
+#include "../h/SymbolTable.h"
 
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <list>
 
 using namespace std;
 

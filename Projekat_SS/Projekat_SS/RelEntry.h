@@ -3,6 +3,7 @@
 #define RELENTRY_H
 
 #include <string>
+#include <list>
 
 class Symbol;
 class Section;

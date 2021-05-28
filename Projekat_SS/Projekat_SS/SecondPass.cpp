@@ -1,11 +1,11 @@
-#include "SecondPass.h"
-#include "parsedTokens.h"
-#include "SymbolTable.h"
-#include "Section.h"
-#include "SectionTable.h"
-#include "Symbol.h"
-#include "RelEntry.h"
-#include "RelTable.h"
+#include "../h/SecondPass.h"
+#include "../h/parsedTokens.h"
+#include "../h/SymbolTable.h"
+#include "../h/Section.h"
+#include "../h/SectionTable.h"
+#include "../h/Symbol.h"
+#include "../h/RelEntry.h"
+#include "../h/RelTable.h"
 
 #include <string>
 #include <iostream>

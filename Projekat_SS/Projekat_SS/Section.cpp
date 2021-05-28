@@ -1,6 +1,6 @@
-#include "Section.h"
-#include "SymbolTable.h"
-#include "Symbol.h"
+#include "../h/Section.h"
+#include "../h/SymbolTable.h"
+#include "../h/Symbol.h"
 
 #include <string>
 #include <fstream>
@@ -142,6 +142,7 @@ void Section::printBytesDec(std::ostream& out) {
     cout << endl;
 }
 void Section::printBytesASCIIHex(std::ostream& out) {
+    if (this->bytesInMemory.size()==0) return;
     out << "Data: " << endl << "\t\t0: ";
     int num = 0;
     for (int i : this->bytesInMemory) {	// stackoverflow.com/ Converting string to ASCII
@@ -159,6 +160,5 @@ void Section::printBytesASCIIHexSquare16(std::ostream& out) {
         out << setfill('0') << setw(2) << hex << i << " ";
         bool writeCR = (num++)%16 == 15;
         out << (writeCR ? ("\n\t\t" + to_string(num) + ": ") : "");
-    }
-    out<< endl;
+    }  
 }

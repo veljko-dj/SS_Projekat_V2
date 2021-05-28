@@ -4,18 +4,18 @@
 
 
 #include <list>
-using namespace std;
+#include <string> 
 
 class Symbol;
 class SymbolTable {
-    static list<Symbol*> table;		// Radim sa pokazivacem da ne bi doslo do nekih kopiranja neplaniranih
+    static std::list<Symbol*> table;		// Radim sa pokazivacem da ne bi doslo do nekih kopiranja neplaniranih
 
 public:
     static void addSymbol(Symbol* symbolPtr);
     static Symbol* getLastSymbol();
     static int getLastOrdNum();
     static Symbol* getLastSection();
-    static Symbol* findSymbolByName(string name);
+    static Symbol* findSymbolByName(std::string name);
     static void  printSymbolTable(std::ostream& out);
     static void  printSymbolTableBinary(std::ostream& out);
 };

@@ -1,5 +1,5 @@
-#include "RelTable.h"
-#include "RelEntry.h"
+#include "../h/RelTable.h"
+#include "../h/RelEntry.h"
 
 #include <iostream>
 #include <fstream>
@@ -27,7 +27,7 @@ RelEntry * RelTable::getLastEntry() {
     if (table.size() > 0) return table.back();
     return nullptr;
 }
-
+ 
 
 RelEntry * RelTable::findRelEntryByOrdNum(int id) {
     RelEntry* sym = nullptr;
@@ -39,7 +39,7 @@ RelEntry * RelTable::findRelEntryByOrdNum(int id) {
     return sym;
 }
 
-void RelTable::printRelTable(ostream& out) {
+void RelTable::printRelTable(ostream& out) { 
     out << "Rel Table: " << endl << setfill(' ');
     out << "\t" << setw(8) << "ord_num:";
     out << "\t" << setw(8) << "loc_offset:";
@@ -50,7 +50,9 @@ void RelTable::printRelTable(ostream& out) {
         (*it)->toString(out);
 }
 
-void RelTable::printRelTableForSection(ostream& out, string nameOfSection) {
+void RelTable::printRelTableForSection(ostream& out, string nameOfSection, int sizeOfSection) { 
+    if (sizeOfSection==0) return;
+
     out << "Rel Table: " << nameOfSection << endl << setfill(' ');
     out << "\t" << setw(8) << "ord_num:";
     out << "\t" << setw(8) << "loc_offset:";

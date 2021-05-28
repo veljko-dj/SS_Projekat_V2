@@ -1,5 +1,5 @@
-#include "SymbolTable.h"
-#include "Symbol.h"
+#include "../h/SymbolTable.h"
+#include "../h/Symbol.h"
 
 #include <string>
 #include <iostream>

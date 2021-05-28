@@ -3,6 +3,9 @@
 #define REL_TABLE_H
 
 #include <list>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 class RelEntry;
 class RelTable {
@@ -11,10 +14,11 @@ class RelTable {
 public:
     static void addEntry(RelEntry* symbolPtr);
     static int getLastOrdNum();
-    static RelEntry* getLastEntry();
+    static RelEntry* getLastEntry(); 
     static RelEntry* findRelEntryByOrdNum(int id);
     static void printRelTable(std::ostream& out);
-    static void printRelTableForSection(std::ostream& out,std::string nameOfSection);
+    static void printRelTableForSection(std::ostream& out,std::string nameOfSection, 
+                                        int sizeOfSection);
 };
 
 
