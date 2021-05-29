@@ -27,7 +27,10 @@ int main(int argc, char *argv[]) {
 
     */
     /*
-        ./asembler_v1  
+        Pokrece se:
+				g++ -Wall -Wextra -pedantic -std=c++11 src/*.cpp -o asembler_v1
+				./asembler_v1 -o izlaznifajl.o ulazni.s
+					Ne smes da nazoves izlazni .txt, imaces problem
     */
 
 
