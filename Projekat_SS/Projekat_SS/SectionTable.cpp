@@ -1,6 +1,11 @@
-#include "../h/SectionTable.h"
-#include "../h/Section.h"
-#include "../h/RelTable.h"
+//#include "../inc/SectionTable.h"
+//#include "../inc/Section.h"
+//#include "../inc/RelTable.h"
+
+#include "SectionTable.h"
+#include "Section.h"
+#include "RelTable.h"
+
 
 #include <list>
 #include <string>

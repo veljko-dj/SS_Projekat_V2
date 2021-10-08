@@ -1,0 +1,26 @@
+# Symbol Table 
+name                section   value     visibility          ordinal   sectionSize
+UND                 0         0         local               0         0         
+ABS                 1         0         local               1         0         
+myCode              2         0         local               2         1c        
+myData              3         0         local               3         2         
+myStart             2         0         global              4         0         
+myCounter           3         0         global              5         0         
+tim_cfg             1         ff10      local               6         0         
+wait                2         a         local               7         0         
+
+# rel myCode
+offset    type                value     
+d         R_386_16            5         
+19        R_386_16            2         
+
+# rel myData
+offset    type                value     
+
+#myCode 1c
+a0 0f 00 00 01 b0 0f 04 ff 10 a0 0f 04 00 00 a0 
+1f 00 00 05 74 01 52 ff 00 00 0a 00 
+
+#myData 2
+00 00 
+

@@ -1,6 +1,10 @@
-#include "../h/Section.h"
-#include "../h/SymbolTable.h"
-#include "../h/Symbol.h"
+//#include "../inc/Section.h"
+//#include "../inc/SymbolTable.h"
+//#include "../inc/Symbol.h"
+
+#include "Section.h"
+#include "SymbolTable.h"
+#include "Symbol.h"
 
 #include <string>
 #include <fstream>
@@ -120,7 +124,7 @@ string Section::toString() {
     string tmpName = name;	// Da bi sacuvao name bez razmaka
     tmpName.insert(tmpName.size(), 15 - tmpName.size(), ' ');
     abc += tmpName;
-    abc += "\t size: ";
+    abc += "\t size(decimal): ";
     abc += to_string(this->sizeFromSymbolTable);
     // abc += " RWX: ";
     // abc += this->rwxNotFromSymbolTable;
@@ -137,7 +141,9 @@ void Section::printBytesDec(std::ostream& out) {
     for (int i : this->bytesInMemory) {	// stackoverflow.com/ Converting string to ASCII
         out << setfill(' ') << setw(3) << dec << i << " ";
         bool writeCR = nextCR.find(num++) != nextCR.end();
-        out << (writeCR ? ("\n" + to_string(num) + ": ") : "");
+        if (writeCR)
+            out << "\n" << hex << (short) num << ": ";
+        // out << (writeCR ? ("\n" + to_string(num) + ": ") : "");
     }
     cout << endl;
 }
@@ -148,17 +154,22 @@ void Section::printBytesASCIIHex(std::ostream& out) {
     for (int i : this->bytesInMemory) {	// stackoverflow.com/ Converting string to ASCII
         out << setfill('0') << setw(2) << hex << i << " ";
         bool writeCR = nextCR.find(num++) != nextCR.end();
-        out << (writeCR ? ("\n\t\t" + to_string(num) + ": ") : "");
+        if (writeCR)
+            out << "\n\t\t" << hex << (short) num << ": ";
+        // out << (writeCR ? ("\n\t\t" + to_string(num) + ": ") : "");
     }
     out << endl;
 }
 
 void Section::printBytesASCIIHexSquare16(std::ostream& out) {
-    out << "Data:" << endl << "\t\t0: ";
+    out << "Data:" << endl << "\t\t 0: ";
     int num = 0;
     for (int i : this->bytesInMemory) {	// stackoverflow.com/ Converting string to ASCII
         out << setfill('0') << setw(2) << hex << i << " ";
         bool writeCR = (num++)%16 == 15;
-        out << (writeCR ? ("\n\t\t" + to_string(num) + ": ") : "");
-    }  
+        if (writeCR)
+            out << "\n\t\t" << hex << (short) num << ": ";
+        // out << (writeCR ? ("\n\t\t" + to_string(num) + ": ") : "");
+    }
+    out << endl;
 }

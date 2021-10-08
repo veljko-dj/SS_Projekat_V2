@@ -19,7 +19,7 @@ class Section {
     int sizeFromSymbolTable;
     std::string rwxNotFromSymbolTable;
 
-    std::set<int> nextCR;	// carriage return
+    std::set<int> nextCR;	// carriage return // OVO TI NE TREBA ! MIKSA ! 
 
 public:
     Section(std::string nameP,std::string rwx = "");

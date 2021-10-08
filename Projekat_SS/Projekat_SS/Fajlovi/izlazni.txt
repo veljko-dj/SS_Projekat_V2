@@ -1,39 +1,57 @@
 Symbol Table :
 ord_num:         name:  val_off:     size:    local:      section:
        0     undefined         0         0         L     undefined
-       1        blaBla         0        27         L        blaBla
-       2            x1     13553         0         L      absolute
-       3            g3        14         0         G        blaBla
-       4            g1        16         0         G        blaBla
-       5           g_4        16         0         G        blaBla
-       6             e         0         0         G        extern
-       7         novaS         0         3         L         novaS
+       1           ivt         0        16         L           ivt
+       2       myStart         0         0         G        extern
+       3     myCounter         0         0         G        extern
+       4           isr         0        62         L           isr
+       5      term_out     65280         0         L      absolute
+       6       term_in     65282         0         L      absolute
+       7     asciiCode        84         0         L      absolute
+       8     isr_reset         0         0         L           isr
+       9     isr_timer         5         0         L           isr
+      10  isr_terminal        22         0         L           isr
 
 
 _______________________________________________________
-SectionName: blaBla         	 size: 27
+
+SectionName: ivt            	 size: 16
 Data: 
-		0: 00 00 00 00 00 00 00 00 00 00 
-		10: 00 00 
-		12: 00 00 
-		14: 00 00 
-		16: 00 00 
-		18: 80 4f 
-		20: 70 46 
-		22: b0 17 03 ff fe 
-		27: 
-Rel Table: blaBla
+		0: 00 00 
+		2: 00 00 
+		4: 05 00 
+		6: 16 00 
+		8: 00 00 00 00 00 00 00 00 
+		16: 
+Rel Table: ivt
 	ord_num:	loc_offset:	  type:	  symOrd (symName):
-	       1	      10	    D16	       4 (g1)	
-	       2	      12	    D16	       6 (e)	
-	       3	      14	    D16	       6 (e)	
-	       4	      16	    D16	       4 (g1)	
-	       5	      25	    REL	       4 (g1)	
+	       1	       0	    D16	       4 (isr)	
+	       2	       4	    D16	       4 (isr)	
+	       3	       6	    D16	       4 (isr)	
 _______________________________________________________
-SectionName: novaS          	 size: 3
+
+SectionName: isr            	 size: 62
 Data: 
-		0: 00 
-		1: 10 0f 
-		3: 
-Rel Table: novaS
+		0: 50 f0 00 00 00 
+		5: b0 06 12 
+		8: a0 00 00 00 54 
+		13: b0 00 04 ff 00 
+		18: a0 06 42 
+		21: 20 
+		22: b0 06 12 
+		25: b0 16 12 
+		28: a0 00 04 ff 02 
+		33: b0 00 04 ff 00 
+		38: a0 07 03 ff fe 
+		43: a0 10 00 00 01 
+		48: 70 01 
+		50: b0 00 04 00 00 
+		55: a0 16 42 
+		58: a0 06 42 
+		61: 20 
+		62: 
+Rel Table: isr
 	ord_num:	loc_offset:	  type:	  symOrd (symName):
+	       4	       3	    D16	       2 (myStart)	
+	       5	      41	    D16	       3 (myCounter)	
+	       6	      53	    D16	       3 (myCounter)	

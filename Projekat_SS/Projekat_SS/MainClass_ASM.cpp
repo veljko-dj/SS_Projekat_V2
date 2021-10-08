@@ -1,4 +1,6 @@
-#include "../h/MainClass_ASM.h"
+//#include "../inc/MainClass_ASM.h"
+
+#include "MainClass_ASM.h"
 
 #include <iostream>
 #include <string>
@@ -16,14 +18,14 @@ ofstream MainClass_ASM::outputFileTxt;
 // Otvara fajlove inputFiles outputFiles
 void MainClass_ASM::openFiles(string input, string output) {
     inputFile.open(input);
-    outputFile.open(output, ios::out | ios::binary);
+    // outputFile.open(output, ios::out | ios::binary);
     outputFileTxt.open(output.substr(0,output.find_last_of(".")).append(".txt"));
-  
+
 
     if (!inputFile.is_open())
         error("Neuspesno otvaranje ulaznog fajla");
-    if (!outputFile.is_open())
-        error("Neuspesno kreiranje izlaznog fajla");
+    // if (!outputFile.is_open())
+    //     error("Neuspesno kreiranje izlaznog fajla");
     if (!outputFileTxt.is_open())
         error("Neuspesno kreiranje izlaznog fajla");
 
@@ -33,7 +35,7 @@ void MainClass_ASM::openFiles(string input, string output) {
 void MainClass_ASM::checkArg(int argc, char * argv[], string& inputStr, string& outputStr) {
     string opt = "-o";
     int posOfExt;
- 
+
 
     if (argc == 2) {	// ulazni.s
         inputStr = argv[1];
@@ -75,10 +77,10 @@ void MainClass_ASM::closeInputFile() {
 }
 
 void MainClass_ASM::closeOutputFile() {
-    outputFile.close();
+    // outputFile.close();
     outputFileTxt.close();
-    if (!outputFile.good())
-        error("Error occurred at writing time!");
+    // if (!outputFile.good())
+    //     error("Error occurred at writing time!");
     if (!outputFileTxt.good())
         error("Error occurred at writing time!");
 }

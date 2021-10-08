@@ -1,8 +1,14 @@
-#include "../h/MainClass_ASM.h"
-#include "../h/firstPass.h"
-#include "../h/parsedTokens.h"
-#include "../h/Symbol.h"
-#include "../h/SymbolTable.h"
+//#include "../inc/MainClass_ASM.h"
+//#include "../inc/firstPass.h"
+//#include "../inc/parsedTokens.h"
+//#include "../inc/Symbol.h"
+//#include "../inc/SymbolTable.h"
+
+#include "MainClass_ASM.h"
+#include "firstPass.h"
+#include "parsedTokens.h"
+#include "Symbol.h"
+#include "SymbolTable.h"
 
 #include <string>
 #include <regex>
@@ -374,7 +380,7 @@ bool FirstPass::externDirective(string line) {
                     {
                         // Dodavanje u tabelu simbola
                         Symbol* sym = new Symbol(ord_num, name, 0/*ne znamo*/,
-                                                 size, type, isLocal, "extern");
+                                                 size, type, isLocal, "extern/und");
                         // "extern" naknadno dodato, nadam se da ne pravi problem nigde
                         ST::addSymbol(sym);
                     }
@@ -390,6 +396,7 @@ bool FirstPass::externDirective(string line) {
 
 bool FirstPass::sectionDirective(string line) {
     smatch match;
+
 
     if (regex_match(line, mojRegex.section)) {
 
@@ -452,6 +459,8 @@ bool FirstPass::wordDirective(string line) {
     smatch match;
 
     if (regex_match(line, mojRegex.word)) {
+        if (currSection== "undefined")
+            error("Word mora biti u okviru neke sekcije",line);
         // Fali ti deo da inicijalizujes alocirani prostor ovim identifikatorima
         line = line.substr(line.find(".word") + 5);
         PT::justCreateTokenWithNoValues(PT::WORD, numOfLine);
@@ -481,12 +490,15 @@ bool FirstPass::skipDirective(string line) {
     smatch match;
 
     if (regex_match(line, mojRegex.skip)) {
-
+        if (currSection== "undefined")
+            error("Skip mora biti u okviru neke sekcije",line);
         line = line.substr(line.find(".skip") + 5);
         regex_search(line, match, mojRegex.number);
         PT::addNextToken(PT::SKIP, match[0], numOfLine);
         {
             // Samo dodam na trenutni offset taj broj
+            // Ako se unese negativan broj tretirace ga
+            // kao pozitivan veci od 16b, skroz okej
             currOffset += stoi(match[0], nullptr,0);
         }
         return true;
@@ -520,7 +532,7 @@ bool FirstPass::equDirective(string line) {
                 int size = 0;			// Nebitno
                 char type = 's';		// e kao simbol iz equ
                 bool isLocal = true;
-                int val_off = stoi(matchLit[0], nullptr, 0);
+                int val_off = (short) stoi(matchLit[0], nullptr, 0);
                 string section = "absolute";
                 // "absolute" -> Predavanja -> str 12(85/349)
                 // Apsolutnim simbolima ne treba relokacija
@@ -533,7 +545,7 @@ bool FirstPass::equDirective(string line) {
                 if (foundSym->getSectionName() != "undefined")
                     error("Vec postoji simbol u tabeli simbola", line);
                 // nastavlja dalje ili kraj programa
-                int val_off = stoi(matchLit[0], nullptr, 0);
+                int val_off = (short) stoi(matchLit[0], nullptr, 0);
                 foundSym->setValOff(val_off);
                 foundSym->setSection("absolute");
             }
@@ -674,6 +686,9 @@ void FirstPass::startFirstPass() {
             error("Leksicka greska, nije ni jedna instrukcija", line);
 
         }
+    }
+    if (!end) {
+        error("Asemblerski fajl mora da sadrzi .end direktivu za kraj fajla", "");
     }
     cout << endl << "\tGotov Prvi prolaz";
 }

@@ -1,11 +1,20 @@
-#include "../h/SecondPass.h"
-#include "../h/parsedTokens.h"
-#include "../h/SymbolTable.h"
-#include "../h/Section.h"
-#include "../h/SectionTable.h"
-#include "../h/Symbol.h"
-#include "../h/RelEntry.h"
-#include "../h/RelTable.h"
+//#include "../inc/SecondPass.h"
+//#include "../inc/parsedTokens.h"
+//#include "../inc/SymbolTable.h"
+//#include "../inc/Section.h"
+//#include "../inc/SectionTable.h"
+//#include "../inc/Symbol.h"
+//#include "../inc/RelEntry.h"
+//#include "../inc/RelTable.h"
+
+#include "SecondPass.h"
+#include "parsedTokens.h"
+#include "SymbolTable.h"
+#include "Section.h"
+#include "SectionTable.h"
+#include "Symbol.h"
+#include "RelEntry.h"
+#include "RelTable.h"
 
 #include <string>
 #include <iostream>
@@ -377,8 +386,8 @@ void SecondPass::startSecondPass() {
                     // registarski indirektno, to nece bas imati smisla
                     string symName = token.getFrontValue();
 
-                    uint8_t byteRdRs = 0xF7;	// Dest: fix , Source : /
-                    uint8_t byteUpAddr = 0x03;	// Update: /, PC rel
+                    uint8_t byteRdRs = 0xF7;	// Dest: fix , Source : PC
+                    uint8_t byteUpAddr = 0x05;	// Update: /, PC rel dir
                     // uint8_t byteUpAddr = 0x00;	// Update: /, NEPOSREDNO
 
 
@@ -497,7 +506,7 @@ void SecondPass::startSecondPass() {
                     // Mislim da je ovaj red gore totalno totalno nebitan
                     // Ipak je bitno jer 0x03 nije PC rel vec reg ind a ti namesti
                     // da taj reg bude PC
-                    uint8_t byteUpAddr = 0x03;	// Update: /, PC rel
+                    uint8_t byteUpAddr = 0x03;	// Update: /, PC rel ind
 
                     currSection->setByteInMemoryAt(currOffset, byteOpMod);
                     currSection->setByteInMemoryAt(currOffset + 1, byteRdRs);

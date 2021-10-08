@@ -1,5 +1,8 @@
-#include "../h/SymbolTable.h"
-#include "../h/Symbol.h"
+//#include "../inc/SymbolTable.h"
+//#include "../inc/Symbol.h"
+
+#include "SymbolTable.h"
+#include "Symbol.h"
 
 #include <string>
 #include <iostream>
@@ -52,10 +55,10 @@ void SymbolTable::printSymbolTable(std::ostream& out) {
     out << "Symbol Table :" << endl;
     out << setw(8) << "ord_num:";
     out << setw(14) << "name:";
+    out << setw(14) << "section:";
     out << setw(10) << "val_off:";
     out << setw(10) << "size:";
     out << setw(10) << "local:";
-    out << setw(14) << "section:";
     out << endl;
     for (list<Symbol*>::iterator it = table.begin(); it != table.end(); ++it)
         (*it)->toString(out);

@@ -25,7 +25,7 @@ class FirstPass {
         regex identfierOrNumber{				//	Bilo sta sem razmaka
             "\\w+" };
         regex simbol{							//  Isto kao ident sa ' '$ i^
-            "^[ \t]*[a-zA-Z]\\w*[ \t]*$" };
+            "^[ \t]*\\w+[ \t]*$" };
         regex number{							//	Broj dec ili hex
             "(\\d+)|(0x(\\d|[a-f]|[A-F])+)" };
         regex everything{						// Bas bilo sta
@@ -56,7 +56,7 @@ class FirstPass {
         regex word{
             "[ \t]*\\.word[ \t]+\\w+([ \t]*,[ \t]*\\w+)*[ \t]*$" };	// kao i \\w umesto \w
         regex skip{
-            "[ \t]*\\.skip[ \t]+\\d+[ \t]*$" };
+            "[ \t]*\\.skip[ \t]+((\\d+)|(0x(\\d|[a-f]|[A-F])+))[ \t]*$" };
         regex equ{
             "[ \t]*\\.equ[ \t]+\\w+[ \t]*,[ \t]*((\\d+)|(0x(\\d|[a-f]|[A-F])+))[ \t]*$" };
         regex end{

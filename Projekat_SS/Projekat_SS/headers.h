@@ -8,8 +8,8 @@
 #include <regex>
 
 
-#include "MainClass.h"
-#include "firstPass.h"
+#include "../inc/MainClass_ASM.h"
+#include "../inc/firstPass.h"
 
 using namespace std;
 

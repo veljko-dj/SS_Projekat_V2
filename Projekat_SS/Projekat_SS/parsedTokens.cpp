@@ -1,4 +1,7 @@
-#include "../h/parsedTokens.h"
+//#include "../inc/parsedTokens.h"
+
+#include "parsedTokens.h"
+
 
 #include <string>
 #include <iostream>

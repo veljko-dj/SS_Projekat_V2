@@ -1,0 +1,37 @@
+# Symbol Table 
+name                section   value     visibility          ordinal   sectionSize
+UND                 0         0         local               0         0         
+ABS                 1         0         local               1         0         
+ivt                 2         0         local               2         10        
+isr                 3         0         local               3         3e        
+myStart             0         0         global              4         0         
+myCounter           0         0         global              5         0         
+term_out            1         ff00      local               6         0         
+term_in             1         ff02      local               7         0         
+asciiCode           1         54        local               8         0         
+isr_reset           3         0         local               9         0         
+isr_timer           3         5         local               a         0         
+isr_terminal        3         16        local               b         0         
+
+# rel ivt
+offset    type                value     
+0         R_386_16            3         
+4         R_386_16            3         
+6         R_386_16            3         
+
+# rel isr
+offset    type                value     
+3         R_386_16            4         
+29        R_386_PC16          5         
+35        R_386_16            5         
+
+#ivt 10
+00 00 00 00 05 00 16 00 00 00 00 00 00 00 00 00 
+
+
+#isr 3e
+50 ff 00 00 00 b0 06 12 a0 0f 00 00 54 b0 0f 04 
+ff 00 a0 06 42 20 b0 06 12 b0 16 12 a0 0f 04 ff 
+02 b0 0f 04 ff 00 a0 07 03 ff fe a0 1f 00 00 01 
+70 01 b0 0f 04 00 00 a0 16 42 a0 06 42 20 
+

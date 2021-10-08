@@ -1,4 +1,7 @@
-#include "../h/Symbol.h"
+//#include "../inc/Symbol.h"
+
+#include "Symbol.h"
+
 
 #include <iostream>
 #include <string>
@@ -83,12 +86,13 @@ Symbol::Symbol() {
 
 
 void Symbol::toString(std::ostream& out) {
-    out << setw(8) << to_string(this->ord_num);
+    out << setw(8) << hex << (short) this->ord_num;
     out << setw(14) << this->name;
-    out << setw(10) << to_string(this->value_offset);
-    out << setw(10) << to_string(this->size);
-    out << setw(10) << ((this->isLocal == 0) ? "G" : "L");
     out << setw(14) << this->section;
+    //out << setw(10) << to_string(this->value_offset);
+    out << setw(10) << hex << (short) this->value_offset;
+    out << setw(10) << hex << (short) this->size ;
+    out << setw(10) << ((this->isLocal == 0) ? "G" : "L");
     out << endl;
 
 }
